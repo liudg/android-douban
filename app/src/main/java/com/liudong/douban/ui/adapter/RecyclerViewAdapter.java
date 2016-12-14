@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.liudong.douban.R;
-import com.liudong.douban.data.model.movie.Actors;
 import com.liudong.douban.data.model.movie.Subjects;
 import com.liudong.douban.ui.activity.MovieDetailActivity;
 
@@ -41,12 +40,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(MyViewHolder holder, int position) {
         final Subjects subjects = mData.get(position);
         String intro = "";
-        for (Actors actor : subjects.directors()) {
-            intro += actor.name() + "/";
-        }
-        for (Actors cast : subjects.casts()) {
-            intro += cast.name() + "/";
-        }
         for (String genre : subjects.genres()) {
             intro += genre + "/";
         }

@@ -24,10 +24,6 @@ public abstract class Subjects implements Parcelable {
 
     public abstract List<String> genres();
 
-    public abstract List<Actors> casts();
-
-    public abstract List<Actors> directors();
-
     public static Builder builder() {
         return new AutoValue_Subjects.Builder();
     }
@@ -50,10 +46,6 @@ public abstract class Subjects implements Parcelable {
         public abstract Builder id(String id);
 
         public abstract Builder genres(List<String> genres);
-
-        public abstract Builder casts(List<Actors> casts);
-
-        public abstract Builder directors(List<Actors> directors);
 
         public abstract Subjects build();
 

@@ -28,6 +28,7 @@ public abstract class Actors implements Parcelable {
 
     @AutoValue.Builder
     public abstract static class Builder {
+
         public abstract Builder alt(String alt);
 
         public abstract Builder avatars(Avatars img);

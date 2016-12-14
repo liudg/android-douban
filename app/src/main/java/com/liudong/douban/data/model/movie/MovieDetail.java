@@ -5,19 +5,18 @@ import android.os.Parcelable;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.liudong.douban.data.model.Avatars;
 
 import java.util.List;
 
 @AutoValue
 public abstract class MovieDetail implements Parcelable {
 
-    public abstract int max();
-
-    public abstract double average();
+    public abstract Rating rating();
 
     public abstract String year();
 
-    public abstract String large();
+    public abstract Avatars images();
 
     public abstract String id();
 
@@ -54,13 +53,11 @@ public abstract class MovieDetail implements Parcelable {
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract Builder max(int max);
-
-        public abstract Builder average(double average);
+        public abstract Builder rating(Rating rating);
 
         public abstract Builder year(String year);
 
-        public abstract Builder large(String img);
+        public abstract Builder images(Avatars img);
 
         public abstract Builder id(String id);
 

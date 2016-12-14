@@ -52,13 +52,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
         intro += subjects.year();
         Glide.with(fragment)
-                .load(subjects.medium())
+                .load(subjects.images().medium())
                 .placeholder(R.mipmap.placeholder)
                 .into(holder.iv_avatar);
         holder.tv_title.setText(subjects.title());
-        holder.rb_start.setNumStars(subjects.max() / 2);
-        holder.rb_start.setRating((float) subjects.average() / 2);
-        holder.tv_rating.setText(String.valueOf(subjects.average()));
+        holder.rb_start.setNumStars(subjects.rating().max() / 2);
+        holder.rb_start.setRating((float) subjects.rating().average() / 2);
+        holder.tv_rating.setText(String.valueOf(subjects.rating().average()));
         holder.tv_cast.setText(intro);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {

@@ -5,13 +5,14 @@ import android.os.Parcelable;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.liudong.douban.data.model.Avatars;
 
 @AutoValue
 public abstract class Actors implements Parcelable {
 
     public abstract String alt();
 
-    public abstract String medium();
+    public abstract Avatars avatars();
 
     public abstract String name();
 
@@ -29,7 +30,7 @@ public abstract class Actors implements Parcelable {
     public abstract static class Builder {
         public abstract Builder alt(String alt);
 
-        public abstract Builder medium(String img);
+        public abstract Builder avatars(Avatars img);
 
         public abstract Builder name(String name);
 

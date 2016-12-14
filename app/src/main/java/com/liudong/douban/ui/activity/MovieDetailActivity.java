@@ -82,7 +82,7 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     private void refreshData() {
         Glide.with(this)
-                .load(movieData.large())
+                .load(movieData.images().large())
                 .into(iv_avatar);
         String intro = "";
         for (String genre : movieData.genres()) {
@@ -94,9 +94,9 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
                 "\n导演：" + movieData.directors().get(0).name() +
                 "\n上映时间：" + movieData.year() +
                 "\n类型：" + intro);
-        tv_rating.setText(String.valueOf(movieData.average()));
-        rb_start.setNumStars(movieData.max() / 2);
-        rb_start.setRating((float) (movieData.average() / 2));
+        tv_rating.setText(String.valueOf(movieData.rating().average()));
+        rb_start.setNumStars(movieData.rating().max() / 2);
+        rb_start.setRating((float) (movieData.rating().average() / 2));
         tv_wish.setText("" + movieData.collect_count() + "人");
         etv_intro.setText(movieData.summary());
         List<Actors> actor = new ArrayList<>();

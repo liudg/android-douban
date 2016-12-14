@@ -35,7 +35,7 @@ public class StaggeredGridAdapter extends RecyclerView.Adapter<StaggeredGridAdap
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Actors actors = mData.get(position);
         Glide.with(activity)
-                .load(actors.medium())
+                .load(actors.avatars().medium())
                 .placeholder(R.mipmap.placeholder)
                 .into(holder.iv_avatar);
         holder.tv_name.setText(actors.name());

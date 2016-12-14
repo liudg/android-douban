@@ -1,6 +1,7 @@
 package com.liudong.douban.ui.adapter;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -58,8 +59,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(fragment.getContext(), MovieDetailActivity.class);
-                intent.putExtra("title", subjects.title());
-                intent.putExtra("id", subjects.id());
+                Bundle bundle = new Bundle();
+                bundle.putString("title", subjects.title());
+                bundle.putString("id", subjects.id());
+                intent.putExtra("data", bundle);
                 fragment.startActivity(intent);
             }
         });

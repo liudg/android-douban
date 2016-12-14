@@ -1,6 +1,7 @@
 package com.liudong.douban.ui.adapter;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.movie.Actors;
+import com.liudong.douban.ui.activity.ActorDetailActivity;
 
 import java.util.List;
 
@@ -33,12 +35,21 @@ public class StaggeredGridAdapter extends RecyclerView.Adapter<StaggeredGridAdap
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Actors actors = mData.get(position);
+        final Actors actors = mData.get(position);
         Glide.with(activity)
                 .load(actors.avatars().medium())
                 .placeholder(R.mipmap.placeholder)
                 .into(holder.iv_avatar);
         holder.tv_name.setText(actors.name());
+
+        holder.iv_avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, ActorDetailActivity.class);
+                intent.putExtra("url", actors.alt());
+                activity.startActivity(intent);
+            }
+        });
     }
 
     @Override

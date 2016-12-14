@@ -74,9 +74,9 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
     }
 
     private void initData() {
-        String title = getIntent().getStringExtra("title");
-        id = getIntent().getStringExtra("id");
-        getSupportActionBar().setTitle(title);
+        Bundle data = getIntent().getBundleExtra("data");
+        id = data.getString("id");
+        getSupportActionBar().setTitle(data.getString("title"));
         detailMPresenter.loadData(Integer.parseInt(id));
     }
 

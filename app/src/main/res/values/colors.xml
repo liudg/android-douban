@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#2196F3</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWithe">#FFFFFF</color>
+
+    <color name="colorBlack">#333333</color>
+    <color name="colorLightGrey">#999999</color>
+    <color name="colorDarkGrey">#666666</color>
+    <color name="colorGrey">#E5E5E5</color>
+    <color name="transBlack">#60000000</color>
+
+    <color name="colorYellow">#FFB712</color>
+
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="tabSelect">#FFFF8D</color>
+</resources>

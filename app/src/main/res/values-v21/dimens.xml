@@ -1,0 +1,6 @@
+<resources>
+    <!--toolbar适配-->
+    <dimen name="toolbar_padding_top">24dp</dimen>
+
+    <dimen name="card_view_margin">8dp</dimen>
+</resources>

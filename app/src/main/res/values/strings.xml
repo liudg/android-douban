@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">逗瓣</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">设置</string>
+    <string name="action_theme">夜间模式</string>
+    <string name="share">分享</string>
+    <string name="refresh">刷新</string>
+
+    <string name="article">逗瓣娱乐资讯</string>
+    <string name="gmail">liudg95@gmail.com</string>
+
+    <string name="movie_tit">逗瓣电影</string>
+    <string name="book_tit">逗瓣图书</string>
+    <string name="Unrealized">功能未实现</string>
+
+    <string name="hot_movie">正在热映</string>
+    <string name="upcoming_movie">即将上映</string>
+    <string name="top_movie">Top250</string>
+
+    <string name="loading">正在加载</string>
+    <string name="load_failed">加载数据失败，请检查网络连接</string>
+    <string name="introduction">简介</string>
+    <string name="vector">影人</string>
+
+    <string name="expand_string">展开</string>
+    <string name="collapsed_string">收起</string>
+
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+</resources>

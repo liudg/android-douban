@@ -7,7 +7,7 @@ import android.content.res.Resources;
  * 单位转换
  */
 
-public class ViewUtil {
+public class DisplayUtil {
 
     public static float pxToDp(float px) {
         float densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;

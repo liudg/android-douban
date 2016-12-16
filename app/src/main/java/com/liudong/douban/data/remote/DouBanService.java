@@ -9,7 +9,7 @@ import retrofit2.http.Query;
 import rx.Observable;
 
 /**
- * 如果不需要任何类型安全的响应，你可以把返回值指定为Call<ResponseBody>
+ * 如果不需要任何类型安全的响应，你可以把返回值指定为Call<ResponseBody>，Observable<ResponseBody>
  */
 public interface DouBanService {
 

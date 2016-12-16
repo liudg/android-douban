@@ -3,8 +3,8 @@ package com.liudong.douban.di.modules;
 import android.content.Context;
 
 import com.liudong.douban.MyApplication;
-import com.liudong.douban.data.remote.RetrofitConfig;
 import com.liudong.douban.data.remote.DouBanService;
+import com.liudong.douban.data.remote.RetrofitConfig;
 import com.liudong.douban.di.scopes.ApplicationContext;
 import com.liudong.douban.utils.ToastUtil;
 
@@ -46,7 +46,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    DouBanService provideDouBanService() {
-        return RetrofitConfig.newDouBanService();
+    DouBanService provideDouBanService(@ApplicationContext Context context) {
+        return new RetrofitConfig().douBanService(context);
     }
 }

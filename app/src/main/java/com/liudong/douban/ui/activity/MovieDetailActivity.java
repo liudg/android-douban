@@ -75,15 +75,15 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     private void initData() {
         Bundle data = getIntent().getBundleExtra("data");
+        Glide.with(this)
+                .load(data.getString("imgUrl"))
+                .into(iv_avatar);
         id = data.getString("id");
         getSupportActionBar().setTitle(data.getString("title"));
         detailMPresenter.loadData(Integer.parseInt(id));
     }
 
     private void refreshData() {
-        Glide.with(this)
-                .load(movieData.images().large())
-                .into(iv_avatar);
         String intro = "";
         for (String genre : movieData.genres()) {
             intro += genre + "/";

@@ -60,6 +60,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onClick(View view) {
                 Intent intent = new Intent(fragment.getContext(), MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
+                bundle.putString("imgUrl", subjects.images().large());
                 bundle.putString("title", subjects.title());
                 bundle.putString("id", subjects.id());
                 intent.putExtra("data", bundle);

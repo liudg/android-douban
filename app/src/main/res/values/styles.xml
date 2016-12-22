@@ -1,14 +1,33 @@
 <resources>
 
-    <!-- Base application theme. -->
+    <!--白天主题-->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="mainBackground">@color/mainBackground</item>
+        <item name="cardViewBackground">@color/cardViewBackground</item>
+        <item name="cardViewTit">@color/cardViewTit</item>
+        <item name="hintColor">@color/colorDarkGrey</item>
+    </style>
+
+    <!--夜间主题-->
+    <style name="NightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimaryN</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkN</item>
+        <item name="colorAccent">@color/colorAccentN</item>
+        <item name="mainBackground">@color/mainBackgroundN</item>
+        <item name="cardViewBackground">@color/cardViewBackgroundN</item>
+        <item name="cardViewTit">@color/cardViewTitN</item>
+        <item name="hintColor">@color/colorGrey</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="NightTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -23,6 +42,10 @@
         <item name="android:minHeight">24dp</item>
         <item name="android:maxWidth">24dp</item>
         <item name="android:maxHeight">24dp</item>
+    </style>
+
+    <style name="TextInputCount">
+        <item name="android:textColor">?attr/hintColor</item>
     </style>
 
 </resources>

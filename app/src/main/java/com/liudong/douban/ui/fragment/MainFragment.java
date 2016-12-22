@@ -22,6 +22,7 @@ public abstract class MainFragment extends Fragment {
     private int toolbarTit;
 
     private Unbinder unbinder;
+    private View view;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,8 @@ public abstract class MainFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(getFragmentLayout(), container, false);
+        view = inflater.inflate(getFragmentLayout(), container, false);
+        return view;
     }
 
     @Override
@@ -65,6 +67,10 @@ public abstract class MainFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public View getView() {
+        return view;
     }
 
     //加载布局

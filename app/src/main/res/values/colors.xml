@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--白天主题-->
     <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#2196F3</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorWithe">#FFFFFF</color>
-
-    <color name="colorBlack">#333333</color>
-    <color name="colorLightGrey">#999999</color>
-    <color name="colorDarkGrey">#666666</color>
-    <color name="colorGrey">#E5E5E5</color>
-    <color name="transBlack">#60000000</color>
-
-    <color name="colorYellow">#FFB712</color>
+    <color name="mainBackground">#FAFAFA</color>
+    <color name="cardViewBackground">#FFFFFF</color>
+    <color name="cardViewTit">#333333</color>
 
     <color name="transparent">#00FFFFFF</color>
+    <color name="colorWithe">#FFFFFF</color>
+    <color name="colorGrey">#E5E5E5</color>
+    <color name="colorLightGrey">#999999</color>
+    <color name="transBlack">#60000000</color>
+    <color name="colorDarkGrey">#666666</color>
+    <color name="colorBlack">#333333</color>
+    <color name="colorYellow">#FFB712</color>
 
+    <color name="btnBg">#0D47A1</color>
+    <color name="btnPressBg">#900D47A1</color>
     <color name="tabSelect">#FFFF8D</color>
+
+    <!--夜间主题-->
+    <color name="colorPrimaryN">#263238</color>
+    <color name="colorPrimaryDarkN">#263238</color>
+    <color name="colorAccentN">#52B1E6</color>
+    <color name="mainBackgroundN">#20292E</color>
+    <color name="cardViewBackgroundN">#37474F</color>
+    <color name="cardViewTitN">#E5E5E5</color>
 </resources>

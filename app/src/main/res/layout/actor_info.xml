@@ -20,5 +20,6 @@
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:paddingTop="4dp"
+        android:textColor="?attr/cardViewTit"
         tools:text="新海城" />
 </LinearLayout>

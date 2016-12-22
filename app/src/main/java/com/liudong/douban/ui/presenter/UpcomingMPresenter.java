@@ -42,16 +42,25 @@ public class UpcomingMPresenter implements Presenter<UpcomingMPresenter.View> {
                 .subscribe(new Subscriber<MovieList>() {
                     @Override
                     public void onCompleted() {
+                        if (view == null) {
+                            return;
+                        }
                         view.hideProgress();
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        if (view == null) {
+                            return;
+                        }
                         view.showMessage(e.getMessage());
                     }
 
                     @Override
                     public void onNext(MovieList movieList) {
+                        if (view == null) {
+                            return;
+                        }
                         view.showMovie(movieList);
                     }
                 });

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/mainBackground"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.liudong.douban.ui.activity.MovieDetailActivity"
     tools:showIn="@layout/activity_movie_detail">
@@ -30,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="8dp"
-                android:background="@color/colorWithe"
+                android:background="?attr/cardViewBackground"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:padding="8dp">
@@ -39,7 +40,7 @@
                     android:id="@+id/tv_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="?attr/cardViewTit"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="8.7" />
@@ -80,7 +81,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:text="@string/introduction"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="?attr/colorAccent" />
 
         <com.liudong.douban.ui.view.ExpandableTextView
             android:id="@+id/etv_intro"
@@ -90,7 +91,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             app:contentTextColor="@color/colorDarkGrey"
-            app:expandCollapseTextColor="@color/colorPrimary"
+            app:expandCollapseTextColor="?attr/colorAccent"
             app:maxCollapsedLines="4" />
 
         <View
@@ -103,7 +104,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:text="@string/vector"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="?attr/colorAccent" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_actors"

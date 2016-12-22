@@ -39,16 +39,14 @@ public class ActorDetailActivity extends BaseActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         mWebView.onPause();
-        mWebView.pauseTimers();
+        super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mWebView.onResume();
-        mWebView.resumeTimers();
     }
 
     @Override

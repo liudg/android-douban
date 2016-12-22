@@ -1,121 +1,154 @@
 package com.liudong.douban.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.liudong.douban.R;
 
-import butterknife.ButterKnife;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.widget.ListPopupWindow.WRAP_CONTENT;
 
-public class LoadMoreWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int ITEM_TYPE_LOAD_MORE = Integer.MAX_VALUE - 2;
+    private static final int ITEM_TYPE_LOAD_FAILED_VIEW = Integer.MAX_VALUE - 1;
+    private static final int ITEM_TYPE_NO_MORE_VIEW = Integer.MAX_VALUE - 2;
+    private static final int ITEM_TYPE_LOAD_MORE_VIEW = Integer.MAX_VALUE - 3;
 
-    private RecyclerView.Adapter<RecyclerView.ViewHolder> mInnerAdapter;
+    private RecyclerView.Adapter mInnerAdapter;
+
     private View mLoadMoreView;
-    private int mLoadMoreLayoutId;
+    private View mLoadMoreFailedView;
+    private View mNoMoreView;
 
-    public LoadMoreWrapper(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
+    private int mCurrentItemType = ITEM_TYPE_LOAD_MORE_VIEW;
+    private RvLoadMoreScrollListener loadMoreScrollListener;
+
+    private boolean isLoadError = false;
+    private boolean isLoadComplete = false;
+
+    public LoadMoreWrapper(RecyclerView.Adapter adapter) {
         mInnerAdapter = adapter;
+        loadMoreScrollListener = new RvLoadMoreScrollListener() {
+            @Override
+            public void loadMore() {
+                if (mOnLoadListener != null) {
+                    if (!isLoadError && !isLoadComplete) {
+                        mOnLoadListener.onLoadMore();
+                    }
+                }
+            }
+        };
     }
 
-    private boolean hasLoadMore() {
-        return mLoadMoreView != null || mLoadMoreLayoutId != 0;
+    public void showLoadMore() {
+        mCurrentItemType = ITEM_TYPE_LOAD_MORE_VIEW;
+        isLoadError = false;
+        isLoadComplete = false;
     }
 
-    private boolean isShowLoadMore(int position) {
-        return hasLoadMore() && (position >= mInnerAdapter.getItemCount());
+    public void showLoadError() {
+        mCurrentItemType = ITEM_TYPE_LOAD_FAILED_VIEW;
+        isLoadError = true;
+        isLoadComplete = false;
+    }
+
+    public void showLoadComplete() {
+        mCurrentItemType = ITEM_TYPE_NO_MORE_VIEW;
+        isLoadError = false;
+        isLoadComplete = true;
+    }
+
+    public void removeLoadMore() {
+        notifyItemRemoved(getItemCount() - 1);
+    }
+
+    private ViewHolder getLoadMoreViewHolder(ViewGroup parent) {
+        if (mLoadMoreView == null) {
+            mLoadMoreView = LayoutInflater.from(parent.getContext()).inflate(R.layout.load_more, parent, false);
+        }
+        return ViewHolder.createViewHolder(mLoadMoreView);
+    }
+
+    private ViewHolder getLoadFailedViewHolder(ViewGroup parent) {
+        if (mLoadMoreFailedView == null) {
+            mLoadMoreFailedView = new TextView(parent.getContext());
+            mLoadMoreFailedView.setPadding(16, 16, 16, 16);
+            mLoadMoreFailedView.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+            ((TextView) mLoadMoreFailedView).setText("加载失败，请点我重试");
+            ((TextView) mLoadMoreFailedView).setGravity(Gravity.CENTER);
+        }
+        return ViewHolder.createViewHolder(mLoadMoreFailedView);
+    }
+
+    private ViewHolder getNoMoreViewHolder(ViewGroup parent) {
+        if (mNoMoreView == null) {
+            mNoMoreView = new TextView(parent.getContext());
+            mNoMoreView.setPadding(16, 16, 16, 16);
+            mNoMoreView.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+            ((TextView) mNoMoreView).setText("已加载全部");
+            ((TextView) mNoMoreView).setGravity(Gravity.CENTER);
+        }
+        return ViewHolder.createViewHolder(mNoMoreView);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (isShowLoadMore(position)) {
-            return ITEM_TYPE_LOAD_MORE;
+        if (position == getItemCount() - 1) {
+            return mCurrentItemType;
         }
         return mInnerAdapter.getItemViewType(position);
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ITEM_TYPE_LOAD_MORE) {
-            ViewHolder holder;
-            if (mLoadMoreView != null) {
-                holder = ViewHolder.createViewHolder(mLoadMoreView);
-            } else {
-                holder = ViewHolder.createViewHolder(parent, mLoadMoreLayoutId);
-                mLoadMoreView = holder.view;
-            }
-            return holder;
+        if (viewType == ITEM_TYPE_NO_MORE_VIEW) {
+            return getNoMoreViewHolder(parent);
+        } else if (viewType == ITEM_TYPE_LOAD_MORE_VIEW) {
+            return getLoadMoreViewHolder(parent);
+        } else if (viewType == ITEM_TYPE_LOAD_FAILED_VIEW) {
+            return getLoadFailedViewHolder(parent);
         }
         return mInnerAdapter.onCreateViewHolder(parent, viewType);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (isShowLoadMore(position)) {
-            if (mOnLoadMoreListener != null) {
-                mOnLoadMoreListener.onLoadMoreRequested();
-            }
+        if (holder.getItemViewType() == ITEM_TYPE_LOAD_FAILED_VIEW) {
+            mLoadMoreFailedView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnLoadListener != null) {
+                        mOnLoadListener.onRetry();
+                        showLoadMore();
+                    }
+                }
+            });
+            return;
+        } else if (holder.getItemViewType() == ITEM_TYPE_LOAD_MORE_VIEW) {
+            return;
+        } else if (holder.getItemViewType() == ITEM_TYPE_NO_MORE_VIEW) {
             return;
         }
         mInnerAdapter.onBindViewHolder(holder, position);
     }
 
     @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        recyclerView.addOnScrollListener(loadMoreScrollListener);
+    }
+
+    @Override
     public int getItemCount() {
-        return mInnerAdapter.getItemCount() == 0 ? 0 : mInnerAdapter.getItemCount() + (hasLoadMore() ? 1 : 0);
-    }
-
-    public interface OnLoadMoreListener {
-        void onLoadMoreRequested();
-    }
-
-    private OnLoadMoreListener mOnLoadMoreListener;
-
-    public LoadMoreWrapper setOnLoadMoreListener(OnLoadMoreListener loadMoreListener) {
-        if (loadMoreListener != null) {
-            mOnLoadMoreListener = loadMoreListener;
-        }
-        return this;
-    }
-
-    public LoadMoreWrapper setLoadMoreView(View loadMoreView) {
-        mLoadMoreView = loadMoreView;
-        return this;
-    }
-
-    public LoadMoreWrapper setLoadMoreView(int layoutId) {
-        mLoadMoreLayoutId = layoutId;
-        return this;
-    }
-
-    public void restartLoad() {
-        if (mLoadMoreView != null) {
-            ProgressBar pb_load = ButterKnife.findById(mLoadMoreView, R.id.pb_load);
-            TextView tv_load = ButterKnife.findById(mLoadMoreView, R.id.tv_load);
-            pb_load.setVisibility(View.VISIBLE);
-            tv_load.setText("正在加载");
-        }
-    }
-
-    public void loadAllComplete() {
-        ProgressBar pb_load = ButterKnife.findById(mLoadMoreView, R.id.pb_load);
-        TextView tv_load = ButterKnife.findById(mLoadMoreView, R.id.tv_load);
-        pb_load.setVisibility(View.GONE);
-        tv_load.setText("已加载全部");
+        return mInnerAdapter.getItemCount() == 0 ? 0 : mInnerAdapter.getItemCount() + 1;
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
-
-        public View view;
-
         ViewHolder(View itemView) {
             super(itemView);
-            view = itemView;
         }
 
         static ViewHolder createViewHolder(View itemView) {
@@ -126,5 +159,19 @@ public class LoadMoreWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHo
             View itemView = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
             return new ViewHolder(itemView);
         }
+    }
+
+    //加载监听
+    public interface OnLoadListener {
+        void onRetry();
+
+        void onLoadMore();
+    }
+
+    private OnLoadListener mOnLoadListener;
+
+    public LoadMoreWrapper setOnLoadListener(OnLoadListener onLoadListener) {
+        mOnLoadListener = onLoadListener;
+        return this;
     }
 }

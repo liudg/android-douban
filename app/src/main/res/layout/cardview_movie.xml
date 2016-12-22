@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/card_view_margin"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="?attr/cardViewBackground">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -27,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/iv_avatar"
             android:layout_toRightOf="@+id/iv_avatar"
-            android:textColor="@color/colorBlack"
+            android:textColor="?attr/cardViewTit"
             android:textSize="16sp"
             tools:text="钢铁侠" />
 

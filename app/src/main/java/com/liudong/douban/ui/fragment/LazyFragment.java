@@ -22,9 +22,11 @@ import butterknife.Unbinder;
  */
 public abstract class LazyFragment extends Fragment {
 
-    private Unbinder unbinder;
     @Inject
     ToastUtil toastUtil;
+
+    private Unbinder unbinder;
+    private View view;
 
     //当前fragment是否可见
     protected boolean isVisible;
@@ -36,14 +38,14 @@ public abstract class LazyFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         injectDagger(((BaseActivity) getActivity()).activityComponent());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(getFragmentLayout(), container, false);
+        view = inflater.inflate(getFragmentLayout(), container, false);
+        return view;
     }
 
     @Override
@@ -77,6 +79,10 @@ public abstract class LazyFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public View getView() {
+        return view;
     }
 
     protected void lazyLoadData() {

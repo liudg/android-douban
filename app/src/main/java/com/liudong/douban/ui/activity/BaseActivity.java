@@ -1,5 +1,6 @@
 package com.liudong.douban.ui.activity;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,11 +27,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Inject
     ToastUtil toastUtil;
 
+    public SharedPreferences sp;
+    public boolean isNight;
+
     private ActivityComponent mActivityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sp = getSharedPreferences("theme", MODE_PRIVATE);
+        isNight = sp.getBoolean("night", false);
+        if (isNight) {
+            setTheme(R.style.NightTheme_NoActionBar);
+        } else {
+            setTheme(R.style.AppTheme_NoActionBar);
+        }
         setContentView(getContentViewID());
         ButterKnife.bind(this);
 

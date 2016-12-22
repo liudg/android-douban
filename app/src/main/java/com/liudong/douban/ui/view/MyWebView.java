@@ -32,7 +32,7 @@ public class MyWebView extends WebView {
         settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         settings.setJavaScriptEnabled(true);
 
-        /**
+        /*
          * 多窗口问题
          * html中的_bank标签就是新建窗口打开，有时会打不开，需要加以下
          * 然后复写WebChromeClient的onCreateWindow方法

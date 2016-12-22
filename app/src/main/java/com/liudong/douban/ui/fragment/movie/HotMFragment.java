@@ -1,7 +1,6 @@
 package com.liudong.douban.ui.fragment.movie;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -57,15 +56,26 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
                     subjects.clear();
                     hotMPresenter.loadData(0, 20);
                     isLoad = true;
-                    loadMoreWrapper.restartLoad();
+                    loadMoreWrapper.showLoadMore();
+                } else {
+                    swipeRefresh.setRefreshing(false);
                 }
             }
         });
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        loadMoreWrapper.setLoadMoreView(R.layout.load_more);
-        loadMoreWrapper.setOnLoadMoreListener(new LoadMoreWrapper.OnLoadMoreListener() {
+        loadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
             @Override
-            public void onLoadMoreRequested() {
+            public void onRetry() {
+                int start = movieData.start();
+                int count = movieData.count();
+                int num = start + count;
+                hotMPresenter.loadData(num, count);
+                isLoad = true;
+            }
+
+            @Override
+            public void onLoadMore() {
                 int start = movieData.start();
                 int count = movieData.count();
                 int total = movieData.total();
@@ -74,9 +84,11 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
                     if (!isLoad) {
                         hotMPresenter.loadData(num, count);
                         isLoad = true;
+                    } else {
+                        loadMoreWrapper.removeLoadMore();
                     }
                 } else {
-                    loadMoreWrapper.loadAllComplete();
+                    loadMoreWrapper.showLoadComplete();
                 }
             }
         });
@@ -113,8 +125,8 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
 
     @Override
     public void showMessage(String message) {
-        swipeRefresh.setRefreshing(false);
-        isLoad = false;
+        hideProgress();
+        loadMoreWrapper.showLoadError();
         Log.e("HotMFragment", message);
         showToast(getString(R.string.load_failed));
     }
@@ -124,12 +136,7 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
         movieData = movieList;
         subjects.addAll(movieList.subjects());
         mAdapter.setDate(subjects);
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                loadMoreWrapper.notifyDataSetChanged();
-            }
-        });
+        loadMoreWrapper.notifyDataSetChanged();
     }
 
     @Override

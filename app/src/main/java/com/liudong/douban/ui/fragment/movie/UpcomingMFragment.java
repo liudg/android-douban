@@ -1,7 +1,6 @@
 package com.liudong.douban.ui.fragment.movie;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -57,26 +56,39 @@ public class UpcomingMFragment extends LazyFragment implements UpcomingMPresente
                     subjects.clear();
                     upcomingMPresenter.loadData(0, 20);
                     isLoad = true;
-                    loadMoreWrapper.restartLoad();
+                } else {
+                    swipeRefresh.setRefreshing(false);
                 }
             }
         });
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        loadMoreWrapper.setLoadMoreView(R.layout.load_more);
-        loadMoreWrapper.setOnLoadMoreListener(new LoadMoreWrapper.OnLoadMoreListener() {
+        loadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
             @Override
-            public void onLoadMoreRequested() {
+            public void onRetry() {
+                int start = movieData.start();
+                int count = movieData.count();
+                int num = start + count;
+                upcomingMPresenter.loadData(num, count);
+                isLoad = true;
+            }
+
+            @Override
+            public void onLoadMore() {
                 int start = movieData.start();
                 int count = movieData.count();
                 int total = movieData.total();
                 int num = start + count;
                 if (num < total) {
                     if (!isLoad) {
+                        loadMoreWrapper.showLoadMore();
                         upcomingMPresenter.loadData(num, count);
                         isLoad = true;
+                    } else {
+                        loadMoreWrapper.removeLoadMore();
                     }
                 } else {
-                    loadMoreWrapper.loadAllComplete();
+                    loadMoreWrapper.showLoadComplete();
                 }
             }
         });
@@ -124,12 +136,7 @@ public class UpcomingMFragment extends LazyFragment implements UpcomingMPresente
         movieData = movieList;
         subjects.addAll(movieList.subjects());
         mAdapter.setDate(subjects);
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                loadMoreWrapper.notifyDataSetChanged();
-            }
-        });
+        loadMoreWrapper.notifyDataSetChanged();
     }
 
     @Override

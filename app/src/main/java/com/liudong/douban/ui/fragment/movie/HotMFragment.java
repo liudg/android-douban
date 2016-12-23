@@ -36,7 +36,9 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
     RecyclerViewAdapter mAdapter = new RecyclerViewAdapter(this);
     LoadMoreWrapper loadMoreWrapper = new LoadMoreWrapper(mAdapter);
 
-    private MovieList movieData;
+    private int start;
+    private int count;
+    private int total;
     private List<Subjects> subjects = new ArrayList<>();
     private boolean isLoad;
 
@@ -68,8 +70,6 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
         loadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
             @Override
             public void onRetry() {
-                int start = movieData.start();
-                int count = movieData.count();
                 int num = start + count;
                 hotMPresenter.loadData(num, count);
                 isLoad = true;
@@ -77,9 +77,6 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
 
             @Override
             public void onLoadMore() {
-                int start = movieData.start();
-                int count = movieData.count();
-                int total = movieData.total();
                 int num = start + count;
                 if (num < total) {
                     if (!isLoad) {
@@ -132,7 +129,9 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
 
     @Override
     public void showMovie(MovieList movieList) {
-        movieData = movieList;
+        start = movieList.start();
+        count = movieList.count();
+        total = movieList.total();
         subjects.addAll(movieList.subjects());
         mAdapter.setDate(subjects);
         loadMoreWrapper.notifyDataSetChanged();

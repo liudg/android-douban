@@ -1,7 +1,10 @@
 package com.liudong.douban.ui.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -79,10 +82,23 @@ public class ActorDetailActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_actor_detail, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
+                return true;
+            case R.id.action_browser:
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
+                startActivity(Intent.createChooser(intent, "请选择浏览器"));
+                return true;
+            case R.id.action_refresh:
+                mWebView.reload();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

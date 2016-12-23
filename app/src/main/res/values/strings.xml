@@ -31,4 +31,6 @@
 
     <string name="login">登录</string>
     <string name="register">注册</string>
+
+    <string name="browser">用浏览器打开</string>
 </resources>

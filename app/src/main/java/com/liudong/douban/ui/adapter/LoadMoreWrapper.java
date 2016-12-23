@@ -1,23 +1,30 @@
 package com.liudong.douban.ui.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.liudong.douban.R;
+import com.liudong.douban.utils.NetworkUtil;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.ListPopupWindow.WRAP_CONTENT;
 
+/**
+ * 为RecyclerView添加加载更多（装饰者模式）
+ */
 public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int ITEM_TYPE_LOAD_FAILED_VIEW = Integer.MAX_VALUE - 1;
     private static final int ITEM_TYPE_NO_MORE_VIEW = Integer.MAX_VALUE - 2;
     private static final int ITEM_TYPE_LOAD_MORE_VIEW = Integer.MAX_VALUE - 3;
 
+    private Context mContext;
     private RecyclerView.Adapter mInnerAdapter;
 
     private View mLoadMoreView;
@@ -25,20 +32,15 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private View mNoMoreView;
 
     private int mCurrentItemType = ITEM_TYPE_LOAD_MORE_VIEW;
-    private RvLoadMoreScrollListener loadMoreScrollListener;
-
-    private boolean isLoadError = false;
-    private boolean isLoadComplete = false;
+    private EndLessOnScrollListener loadMoreScrollListener;
 
     public LoadMoreWrapper(RecyclerView.Adapter adapter) {
         mInnerAdapter = adapter;
-        loadMoreScrollListener = new RvLoadMoreScrollListener() {
+        loadMoreScrollListener = new EndLessOnScrollListener() {
             @Override
             public void loadMore() {
                 if (mOnLoadListener != null) {
-                    if (!isLoadError && !isLoadComplete) {
-                        mOnLoadListener.onLoadMore();
-                    }
+                    mOnLoadListener.onLoadMore();
                 }
             }
         };
@@ -46,37 +48,30 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void showLoadMore() {
         mCurrentItemType = ITEM_TYPE_LOAD_MORE_VIEW;
-        isLoadError = false;
-        isLoadComplete = false;
+        notifyItemChanged(getItemCount() - 1);
     }
 
     public void showLoadError() {
         mCurrentItemType = ITEM_TYPE_LOAD_FAILED_VIEW;
-        isLoadError = true;
-        isLoadComplete = false;
+        notifyItemChanged(getItemCount() - 1);
     }
 
     public void showLoadComplete() {
         mCurrentItemType = ITEM_TYPE_NO_MORE_VIEW;
-        isLoadError = false;
-        isLoadComplete = true;
-    }
-
-    public void removeLoadMore() {
-        notifyItemRemoved(getItemCount() - 1);
+        notifyItemChanged(getItemCount() - 1);
     }
 
     private ViewHolder getLoadMoreViewHolder(ViewGroup parent) {
         if (mLoadMoreView == null) {
-            mLoadMoreView = LayoutInflater.from(parent.getContext()).inflate(R.layout.load_more, parent, false);
+            mLoadMoreView = LayoutInflater.from(mContext).inflate(R.layout.load_more, parent, false);
         }
         return ViewHolder.createViewHolder(mLoadMoreView);
     }
 
-    private ViewHolder getLoadFailedViewHolder(ViewGroup parent) {
+    private ViewHolder getLoadFailedViewHolder() {
         if (mLoadMoreFailedView == null) {
-            mLoadMoreFailedView = new TextView(parent.getContext());
-            mLoadMoreFailedView.setPadding(16, 16, 16, 16);
+            mLoadMoreFailedView = new TextView(mContext);
+            mLoadMoreFailedView.setPadding(16, 24, 16, 32);
             mLoadMoreFailedView.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
             ((TextView) mLoadMoreFailedView).setText("加载失败，请点我重试");
             ((TextView) mLoadMoreFailedView).setGravity(Gravity.CENTER);
@@ -84,10 +79,10 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return ViewHolder.createViewHolder(mLoadMoreFailedView);
     }
 
-    private ViewHolder getNoMoreViewHolder(ViewGroup parent) {
+    private ViewHolder getNoMoreViewHolder() {
         if (mNoMoreView == null) {
-            mNoMoreView = new TextView(parent.getContext());
-            mNoMoreView.setPadding(16, 16, 16, 16);
+            mNoMoreView = new TextView(mContext);
+            mNoMoreView.setPadding(16, 24, 16, 32);
             mNoMoreView.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
             ((TextView) mNoMoreView).setText("已加载全部");
             ((TextView) mNoMoreView).setGravity(Gravity.CENTER);
@@ -106,11 +101,11 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == ITEM_TYPE_NO_MORE_VIEW) {
-            return getNoMoreViewHolder(parent);
+            return getNoMoreViewHolder();
         } else if (viewType == ITEM_TYPE_LOAD_MORE_VIEW) {
             return getLoadMoreViewHolder(parent);
         } else if (viewType == ITEM_TYPE_LOAD_FAILED_VIEW) {
-            return getLoadFailedViewHolder(parent);
+            return getLoadFailedViewHolder();
         }
         return mInnerAdapter.onCreateViewHolder(parent, viewType);
     }
@@ -121,9 +116,13 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mLoadMoreFailedView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (!NetworkUtil.isNetworkConnected(mContext)) {
+                        Toast.makeText(mContext, R.string.load_failed, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     if (mOnLoadListener != null) {
-                        mOnLoadListener.onRetry();
                         showLoadMore();
+                        mOnLoadListener.onRetry();
                     }
                 }
             });
@@ -159,6 +158,10 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
             View itemView = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
             return new ViewHolder(itemView);
         }
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
     }
 
     //加载监听

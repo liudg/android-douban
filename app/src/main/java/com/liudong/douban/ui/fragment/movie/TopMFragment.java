@@ -54,6 +54,7 @@ public class TopMFragment extends LazyFragment implements TopMPresenter.View {
             public void onRefresh() {
                 if (!isLoad) {
                     subjects.clear();
+                    loadMoreWrapper.showLoadMore();
                     topMPresenter.loadData(0, 20);
                     isLoad = true;
                 } else {
@@ -63,6 +64,7 @@ public class TopMFragment extends LazyFragment implements TopMPresenter.View {
         });
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        loadMoreWrapper.setContext(getActivity());
         loadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
             @Override
             public void onRetry() {
@@ -81,11 +83,8 @@ public class TopMFragment extends LazyFragment implements TopMPresenter.View {
                 int num = start + count;
                 if (num < total) {
                     if (!isLoad) {
-                        loadMoreWrapper.showLoadMore();
                         topMPresenter.loadData(num, count);
                         isLoad = true;
-                    } else {
-                        loadMoreWrapper.removeLoadMore();
                     }
                 } else {
                     loadMoreWrapper.showLoadComplete();
@@ -125,8 +124,8 @@ public class TopMFragment extends LazyFragment implements TopMPresenter.View {
 
     @Override
     public void showMessage(String message) {
-        swipeRefresh.setRefreshing(false);
-        isLoad = false;
+        hideProgress();
+        loadMoreWrapper.showLoadError();
         Log.e("TopMFragment", message);
         showToast(getString(R.string.load_failed));
     }

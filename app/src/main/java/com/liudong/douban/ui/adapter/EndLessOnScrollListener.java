@@ -7,8 +7,7 @@ import android.support.v7.widget.RecyclerView;
  * Created by liudong on 2016/12/20.
  * Desc:用于RecyclerView加载更多的监听，实现滑动到底部自动加载更多
  */
-
-public abstract class RvLoadMoreScrollListener extends RecyclerView.OnScrollListener {
+abstract class EndLessOnScrollListener extends RecyclerView.OnScrollListener {
 
     private int previousTotal;
     private boolean isLoading = true;
@@ -24,12 +23,15 @@ public abstract class RvLoadMoreScrollListener extends RecyclerView.OnScrollList
             if (totalItemCount > previousTotal) {//加载更多结束
                 isLoading = false;
                 previousTotal = totalItemCount;
-            } else if (totalItemCount <= previousTotal) {//用户刷新结束
+            } else if (totalItemCount < previousTotal) {//用户刷新结束
                 previousTotal = totalItemCount;
                 isLoading = false;
+            } else {
+                isLoading = true;
             }
         }
         if (!isLoading && visibleItemCount > 0 && totalItemCount - 1 == lastVisibleItemPosition && recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
+            isLoading = true;
             loadMore();
         }
     }

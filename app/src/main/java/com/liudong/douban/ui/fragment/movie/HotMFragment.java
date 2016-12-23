@@ -54,9 +54,9 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
             public void onRefresh() {
                 if (!isLoad) {
                     subjects.clear();
+                    loadMoreWrapper.showLoadMore();
                     hotMPresenter.loadData(0, 20);
                     isLoad = true;
-                    loadMoreWrapper.showLoadMore();
                 } else {
                     swipeRefresh.setRefreshing(false);
                 }
@@ -64,6 +64,7 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
         });
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        loadMoreWrapper.setContext(getActivity());
         loadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
             @Override
             public void onRetry() {
@@ -84,8 +85,6 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
                     if (!isLoad) {
                         hotMPresenter.loadData(num, count);
                         isLoad = true;
-                    } else {
-                        loadMoreWrapper.removeLoadMore();
                     }
                 } else {
                     loadMoreWrapper.showLoadComplete();

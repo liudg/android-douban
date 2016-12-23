@@ -54,6 +54,7 @@ public class UpcomingMFragment extends LazyFragment implements UpcomingMPresente
             public void onRefresh() {
                 if (!isLoad) {
                     subjects.clear();
+                    loadMoreWrapper.showLoadMore();
                     upcomingMPresenter.loadData(0, 20);
                     isLoad = true;
                 } else {
@@ -63,6 +64,7 @@ public class UpcomingMFragment extends LazyFragment implements UpcomingMPresente
         });
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        loadMoreWrapper.setContext(getActivity());
         loadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
             @Override
             public void onRetry() {
@@ -81,11 +83,8 @@ public class UpcomingMFragment extends LazyFragment implements UpcomingMPresente
                 int num = start + count;
                 if (num < total) {
                     if (!isLoad) {
-                        loadMoreWrapper.showLoadMore();
                         upcomingMPresenter.loadData(num, count);
                         isLoad = true;
-                    } else {
-                        loadMoreWrapper.removeLoadMore();
                     }
                 } else {
                     loadMoreWrapper.showLoadComplete();
@@ -125,8 +124,8 @@ public class UpcomingMFragment extends LazyFragment implements UpcomingMPresente
 
     @Override
     public void showMessage(String message) {
-        swipeRefresh.setRefreshing(false);
-        isLoad = false;
+        hideProgress();
+        loadMoreWrapper.showLoadError();
         Log.e("UpcomingMFragment", message);
         showToast(getString(R.string.load_failed));
     }

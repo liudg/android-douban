@@ -32,7 +32,7 @@ public abstract class LazyFragment extends Fragment {
     protected boolean isVisible;
     //view是否初始化完成
     protected boolean isInitView;
-    // 是否加载过数据
+    //是否加载过数据
     protected boolean isLoadData;
 
     @Override
@@ -46,6 +46,12 @@ public abstract class LazyFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(getFragmentLayout(), container, false);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -75,22 +81,16 @@ public abstract class LazyFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    public View getView() {
-        return view;
-    }
-
     protected void lazyLoadData() {
         if (!isInitView || !isVisible || isLoadData) {
             return;
         }
         initData();
         isLoadData = true;
+    }
+
+    public View getView() {
+        return view;
     }
 
     /**

@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.liudong.douban.MyApplication;
 import com.liudong.douban.R;
-import com.liudong.douban.utils.NetworkUtil;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.ListPopupWindow.WRAP_CONTENT;
@@ -116,7 +116,7 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mLoadMoreFailedView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!NetworkUtil.isNetworkConnected(mContext)) {
+                    if (!MyApplication.getInstance().isConnected()) {
                         Toast.makeText(mContext, R.string.load_failed, Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -151,11 +151,10 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         static ViewHolder createViewHolder(View itemView) {
-            return new ViewHolder(itemView);
-        }
-
-        static ViewHolder createViewHolder(ViewGroup parent, int layoutId) {
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
+            ViewGroup mParent = (ViewGroup) itemView.getParent();
+            if (mParent != null) {
+                mParent.removeView(itemView);
+            }
             return new ViewHolder(itemView);
         }
     }

@@ -6,12 +6,13 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.liudong.douban.MyApplication;
 import com.liudong.douban.di.scopes.ApplicationContext;
 import com.liudong.douban.utils.MyAdapterFactory;
-import com.liudong.douban.utils.NetworkUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.Interceptor;
@@ -47,7 +48,7 @@ public class RetrofitConfig {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request request = chain.request();
-                if (!NetworkUtil.isNetworkConnected(context)) {
+                if (!MyApplication.getInstance().isConnected()) {
                     Log.i("OFFLINE_INTERCEPTOR", "请求缓存");
                     int maxStale = 60 * 60 * 24 * 14; //设置缓存超时时间为2周
                     request = request.newBuilder()
@@ -66,6 +67,7 @@ public class RetrofitConfig {
 
         //创建OkHttpClient，并添加拦截器和缓存
         OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .addNetworkInterceptor(REWRITE_RESPONSE_INTERCEPTOR)
                 .addInterceptor(OFFLINE_INTERCEPTOR)
                 .cache(cache).build();

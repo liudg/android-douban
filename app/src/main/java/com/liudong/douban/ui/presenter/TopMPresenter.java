@@ -15,7 +15,7 @@ import rx.schedulers.Schedulers;
  * class note:
  */
 @PerActivity
-public class TopMPresenter implements Presenter<TopMPresenter.View> {
+public class TopMPresenter extends Presenter<TopMPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
@@ -27,22 +27,24 @@ public class TopMPresenter implements Presenter<TopMPresenter.View> {
 
     @Override
     public void attachView(View view) {
+        fragmentLifecycle.onNext(FragmentEvent.CREATE_VIEW);
         this.view = view;
     }
 
     @Override
     public void detachView() {
+        fragmentLifecycle.onNext(FragmentEvent.DESTROY_VIEW);
         view = null;
     }
 
     public void loadData(int start, int count) {
         mDataManager.loadTopMovies(start, count)
+                .compose(this.<MovieList>bindFragmentEvent(FragmentEvent.DESTROY_VIEW))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<MovieList>() {
                     @Override
                     public void onCompleted() {
-                        view.hideProgress();
                     }
 
                     @Override

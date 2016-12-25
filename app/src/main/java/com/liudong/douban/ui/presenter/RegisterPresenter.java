@@ -6,7 +6,7 @@ import com.liudong.douban.di.scopes.PerActivity;
 import javax.inject.Inject;
 
 @PerActivity
-public class RegisterPresenter implements Presenter<RegisterPresenter.View> {
+public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
@@ -18,11 +18,13 @@ public class RegisterPresenter implements Presenter<RegisterPresenter.View> {
 
     @Override
     public void attachView(View view) {
+        activityLifecycle.onNext(ActivityEvent.CREATE);
         this.view = view;
     }
 
     @Override
     public void detachView() {
+        activityLifecycle.onNext(ActivityEvent.DESTROY);
         view = null;
     }
 

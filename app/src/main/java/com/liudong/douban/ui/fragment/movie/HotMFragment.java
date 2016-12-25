@@ -9,15 +9,11 @@ import android.view.View;
 
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.movie.MovieList;
-import com.liudong.douban.data.model.movie.Subjects;
 import com.liudong.douban.di.components.ActivityComponent;
 import com.liudong.douban.ui.adapter.LoadMoreWrapper;
 import com.liudong.douban.ui.adapter.RecyclerViewAdapter;
 import com.liudong.douban.ui.fragment.LazyFragment;
 import com.liudong.douban.ui.presenter.HotMPresenter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -39,7 +35,6 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
     private int start;
     private int count;
     private int total;
-    private List<Subjects> subjects = new ArrayList<>();
     private boolean isLoad;
 
     public static HotMFragment newInstance() {
@@ -55,7 +50,6 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
             @Override
             public void onRefresh() {
                 if (!isLoad) {
-                    subjects.clear();
                     loadMoreWrapper.showLoadMore();
                     hotMPresenter.loadData(0, 20);
                     isLoad = true;
@@ -93,8 +87,11 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        if (isLoad) {
+            loadMoreWrapper.showLoadError();
+        }
         hotMPresenter.detachView();
+        super.onDestroyView();
     }
 
     @Override
@@ -132,9 +129,13 @@ public class HotMFragment extends LazyFragment implements HotMPresenter.View {
         start = movieList.start();
         count = movieList.count();
         total = movieList.total();
-        subjects.addAll(movieList.subjects());
-        mAdapter.setDate(subjects);
-        loadMoreWrapper.notifyDataSetChanged();
+        mAdapter.setDate(start, movieList.subjects());
+        if (start == 0) {
+            loadMoreWrapper.notifyDataSetChanged();
+        } else {
+            loadMoreWrapper.notifyItemInserted(start);
+        }
+        hideProgress();
     }
 
     @Override

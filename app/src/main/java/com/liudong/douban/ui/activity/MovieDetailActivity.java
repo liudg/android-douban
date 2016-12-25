@@ -107,8 +107,8 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         detailMPresenter.detachView();
+        super.onDestroy();
     }
 
     @Override
@@ -130,6 +130,7 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     @Override
     public void showMessage(String message) {
+        hideProgress();
         Log.e("MovieDetailActivity", message);
         showToast(getString(R.string.load_failed));
     }
@@ -138,6 +139,7 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
     public void showMovieDetail(MovieDetail movieDetail) {
         movieData = movieDetail;
         refreshData();
+        hideProgress();
     }
 
     @Override

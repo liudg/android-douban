@@ -11,7 +11,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 @PerActivity
-public class DetailMPresenter implements Presenter<DetailMPresenter.View> {
+public class DetailMPresenter extends Presenter<DetailMPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
@@ -23,22 +23,24 @@ public class DetailMPresenter implements Presenter<DetailMPresenter.View> {
 
     @Override
     public void attachView(View view) {
+        activityLifecycle.onNext(ActivityEvent.CREATE);
         this.view = view;
     }
 
     @Override
     public void detachView() {
+        activityLifecycle.onNext(ActivityEvent.DESTROY);
         view = null;
     }
 
     public void loadData(int id) {
         mDataManager.loadMovieDetail(id)
+                .compose(this.<MovieDetail>bindActivityEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<MovieDetail>() {
                     @Override
                     public void onCompleted() {
-                        view.hideProgress();
                     }
 
                     @Override

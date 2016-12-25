@@ -15,7 +15,7 @@ import rx.schedulers.Schedulers;
  * class note:
  */
 @PerActivity
-public class UpcomingMPresenter implements Presenter<UpcomingMPresenter.View> {
+public class UpcomingMPresenter extends Presenter<UpcomingMPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
@@ -27,40 +27,33 @@ public class UpcomingMPresenter implements Presenter<UpcomingMPresenter.View> {
 
     @Override
     public void attachView(View view) {
+        fragmentLifecycle.onNext(FragmentEvent.CREATE_VIEW);
         this.view = view;
     }
 
     @Override
     public void detachView() {
+        fragmentLifecycle.onNext(FragmentEvent.DESTROY_VIEW);
         view = null;
     }
 
     public void loadData(int start, int count) {
         mDataManager.loadUpMovies(start, count)
+                .compose(this.<MovieList>bindFragmentEvent(FragmentEvent.DESTROY_VIEW))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<MovieList>() {
                     @Override
                     public void onCompleted() {
-                        if (view == null) {
-                            return;
-                        }
-                        view.hideProgress();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (view == null) {
-                            return;
-                        }
                         view.showMessage(e.getMessage());
                     }
 
                     @Override
                     public void onNext(MovieList movieList) {
-                        if (view == null) {
-                            return;
-                        }
                         view.showMovie(movieList);
                     }
                 });

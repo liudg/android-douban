@@ -74,8 +74,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mData == null ? 0 : mData.size();
     }
 
-    public void setDate(List<Subjects> subjects) {
-        mData.clear();
+    public void setDate(int position, List<Subjects> subjects) {
+        if (position == 0) {
+            mData.clear();
+        }
         mData.addAll(subjects);
     }
 

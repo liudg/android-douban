@@ -283,10 +283,10 @@ public class ExpandableTextView extends LinearLayout implements View.OnClickList
         mStateTextColor = typedArray.getColor(R.styleable.ExpandableTextView_expandCollapseTextColor, Color.BLACK);
 
         if (mExpandDrawable == null) {
-            mExpandDrawable = getDrawable(getContext(), R.drawable.ic_expand_more_black_12dp);
+            mExpandDrawable = getDrawable(getContext(), R.drawable.ic_expand_more);
         }
         if (mCollapseDrawable == null) {
-            mCollapseDrawable = getDrawable(getContext(), R.drawable.ic_expand_less_black_12dp);
+            mCollapseDrawable = getDrawable(getContext(), R.drawable.ic_expand_less);
         }
 
         if (mExpandString == null) {

@@ -10,39 +10,31 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/layout_number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColorHint="?attr/hintColor"
+        style="@style/TextInputLayout"
         app:counterEnabled="true"
         app:counterMaxLength="11"
         app:counterTextAppearance="@style/TextInputCount">
 
         <EditText
             android:id="@+id/et_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/EditText"
             android:hint="手机号"
-            android:maxLines="1"
-            android:textColor="?attr/hintColor" />
+            android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/layout_password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColorHint="?attr/hintColor"
+        style="@style/TextInputLayout"
         app:counterEnabled="true"
         app:counterMaxLength="11"
         app:counterTextAppearance="@style/TextInputCount">
 
         <EditText
             android:id="@+id/et_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/EditText"
             android:hint="密码"
             android:inputType="textPassword"
-            android:maxLines="1"
-            android:textColor="?attr/hintColor" />
+            android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
 
     <FrameLayout
@@ -51,17 +43,14 @@
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/layout_auth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColorHint="?attr/hintColor">
+            style="@style/TextInputLayout">
 
             <EditText
                 android:id="@+id/et_auth"
+                style="@style/EditText"
                 android:layout_width="200dp"
-                android:layout_height="wrap_content"
                 android:hint="验证码"
-                android:maxLines="1"
-                android:textColor="?attr/hintColor" />
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
         <Button

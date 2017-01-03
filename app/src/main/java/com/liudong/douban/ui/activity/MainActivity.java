@@ -24,7 +24,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.liudong.douban.MyApplication;
 import com.liudong.douban.R;
+import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
 import com.liudong.douban.ui.fragment.book.BookFragment;
 import com.liudong.douban.ui.fragment.movie.MovieFragment;
@@ -37,6 +40,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobUser;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -44,6 +50,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout drawer;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
+    private View headerView;
 
     @Inject
     MainDisplay mainDisplay;
@@ -58,6 +65,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        headerView = navigationView.getHeaderView(0);
         if (savedInstanceState == null) {
             getSupportActionBar().setTitle(R.string.movie_tit);
             navigationView.setCheckedItem(R.id.nav_movie);
@@ -66,6 +74,31 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             drawer.setFitsSystemWindows(true);
             drawer.setClipToPadding(false);
+        }
+        initLoginState();
+    }
+
+    private void initLoginState() {
+        Bmob.initialize(this, "ca3beeb6c325e061d5c2e65324e9be5f");
+        Person person = BmobUser.getCurrentUser(Person.class);
+        if (person != null) {
+            MyApplication.getInstance().setLogin(true);
+            CircleImageView iv_avatar = (CircleImageView) headerView.findViewById(R.id.iv_avatar);
+            TextView tv_name = (TextView) headerView.findViewById(R.id.tv_name);
+            TextView tv_dec = (TextView) headerView.findViewById(R.id.tv_dec);
+            tv_name.setText(person.getUsername());
+            if (person.getPicture() != null) {
+                Glide.with(this)
+                        .load(person.getPicture())
+                        .into(iv_avatar);
+            }
+            if (person.getDescription() != null) {
+                tv_dec.setText(person.getDescription());
+            } else {
+                tv_dec.setText("这个人很懒，什么都没有留下");
+            }
+        } else {
+            MyApplication.getInstance().setLogin(false);
         }
     }
 
@@ -103,7 +136,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         theme.resolveAttribute(R.attr.cardViewTit, cardViewTit, true);
 
         toolbar.setBackgroundResource(toolbarBg.resourceId);
-        navigationView.getHeaderView(0).setBackgroundResource(toolbarBg.resourceId);
+        headerView.setBackgroundResource(toolbarBg.resourceId);
 
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragments) {
@@ -238,7 +271,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 getSupportActionBar().setTitle(R.string.book_tit);
                 break;
             case R.id.me:
-                startActivity(new Intent(this, LoginActivity.class));
+                if (MyApplication.getInstance().isLogin()) {
+                    startActivity(new Intent(this, MemberActivity.class));
+                } else {
+                    startActivity(new Intent(this, LoginActivity.class));
+                }
                 break;
             case R.id.about:
                 break;

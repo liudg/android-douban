@@ -1,15 +1,27 @@
 package com.liudong.douban.ui.presenter;
 
 import com.liudong.douban.data.DataManager;
+import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.scopes.PerActivity;
 
 import javax.inject.Inject;
+
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
+import cn.smssdk.EventHandler;
+import cn.smssdk.SMSSDK;
+import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 @PerActivity
 public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
+    private CompositeSubscription mCompositeSubscription;
+
+    private String number;
+    private String password;
 
     @Inject
     RegisterPresenter(DataManager dataManager) {
@@ -18,18 +30,70 @@ public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
 
     @Override
     public void attachView(View view) {
-        activityLifecycle.onNext(ActivityEvent.CREATE);
         this.view = view;
     }
 
     @Override
     public void detachView() {
-        activityLifecycle.onNext(ActivityEvent.DESTROY);
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.unsubscribe();
+        }
         view = null;
     }
 
-    public void register() {
-        view.succeed();
+    public EventHandler getEventHandler() {
+        return new EventHandler() {
+            @Override
+            public void afterEvent(int event, int result, final Object data) {
+                if (result == SMSSDK.RESULT_COMPLETE) {
+                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                        //提交验证码成功
+                        register();
+                    } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
+                        //获取验证码成功
+                    } else if (event == SMSSDK.EVENT_GET_SUPPORTED_COUNTRIES) {
+                        //返回支持发送验证码的国家列表
+                    }
+                } else {
+                    ((Throwable) data).printStackTrace();
+                    view.showMessage(((Throwable) data).getMessage());
+                }
+            }
+        };
+    }
+
+    private void register() {
+        Person person = new Person();
+        person.setUsername("逗瓣_" + number);
+        person.setPassword(password);
+        person.setMobilePhoneNumber(number);
+        addSubscription(person.signUp(new SaveListener<Person>() {
+            @Override
+            public void done(Person person, BmobException e) {
+                if (e == null) {
+                    view.succeed();
+                } else {
+                    view.showMessage(e.getMessage());
+                }
+            }
+        }));
+    }
+
+    /**
+     * 解决Subscription内存泄露问题
+     *
+     * @param s
+     */
+    private void addSubscription(Subscription s) {
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
+        }
+        mCompositeSubscription.add(s);
+    }
+
+    public void setInfo(String num, String pw) {
+        number = num;
+        password = pw;
     }
 
     public interface View {

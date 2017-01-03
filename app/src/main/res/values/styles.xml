@@ -44,6 +44,18 @@
         <item name="android:maxHeight">24dp</item>
     </style>
 
+    <style name="TextInputLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColorHint">?attr/hintColor</item>
+    </style>
+
+    <style name="EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/hintColor</item>
+    </style>
+
     <style name="TextInputCount">
         <item name="android:textColor">?attr/hintColor</item>
     </style>

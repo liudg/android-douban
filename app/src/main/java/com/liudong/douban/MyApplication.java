@@ -20,6 +20,7 @@ public class MyApplication extends Application {
 
     private static MyApplication application;
     private boolean isConnected;  //是否有网络连接
+    private boolean isLogin;  //是否登录
 
     @Override
     public void onCreate() {
@@ -49,6 +50,14 @@ public class MyApplication extends Application {
 
     public void setConnected(boolean connected) {
         isConnected = connected;
+    }
+
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLogin(boolean login) {
+        isLogin = login;
     }
 
     public static MyApplication getInstance() {

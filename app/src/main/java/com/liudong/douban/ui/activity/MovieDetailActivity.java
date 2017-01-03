@@ -190,11 +190,10 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
     private void refreshMenuItemView(MenuItem item) {
         refreshItem = item;
         ImageView refreshView = (ImageView) getLayoutInflater().inflate(R.layout.rotate_imageview, null);
-        refreshItem.setActionView(refreshView);
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate_ic_refresh);
-        animation.setRepeatMode(Animation.RESTART);
         animation.setRepeatCount(Animation.INFINITE);
         refreshView.setAnimation(animation);
+        refreshItem.setActionView(refreshView);
     }
 
     private void hideRefreshAnimation() {

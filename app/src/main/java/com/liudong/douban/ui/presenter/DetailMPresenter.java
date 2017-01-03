@@ -17,7 +17,7 @@ public class DetailMPresenter extends Presenter<DetailMPresenter.View> {
     private final DataManager mDataManager;
 
     @Inject
-    public DetailMPresenter(DataManager dataManager) {
+    DetailMPresenter(DataManager dataManager) {
         mDataManager = dataManager;
     }
 

@@ -3,7 +3,9 @@ package com.liudong.douban.di.components;
 import com.liudong.douban.di.modules.ActivityModule;
 import com.liudong.douban.di.scopes.PerActivity;
 import com.liudong.douban.ui.activity.BaseActivity;
+import com.liudong.douban.ui.activity.EditProfileActivity;
 import com.liudong.douban.ui.activity.MainActivity;
+import com.liudong.douban.ui.activity.MemberActivity;
 import com.liudong.douban.ui.activity.MovieDetailActivity;
 import com.liudong.douban.ui.fragment.BaseFragment;
 import com.liudong.douban.ui.fragment.LazyFragment;
@@ -38,5 +40,9 @@ public interface ActivityComponent {
     void inject(LoginFragment loginFragment);
 
     void inject(RegisterFragment registerFragment);
+
+    void inject(EditProfileActivity editProfileActivity);
+
+    void inject(MemberActivity memberActivity);
 
 }

@@ -13,20 +13,15 @@ import android.widget.EditText;
 
 import com.liudong.douban.R;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.ui.activity.EditProfileActivity;
 import com.liudong.douban.ui.activity.LoginActivity;
-import com.liudong.douban.ui.activity.MemberActivity;
 import com.liudong.douban.ui.fragment.BaseFragment;
 import com.liudong.douban.ui.presenter.RegisterPresenter;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 
 public class RegisterFragment extends BaseFragment implements RegisterPresenter.View {
@@ -43,7 +38,6 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     TextInputLayout layout_auth;
     @BindView(R.id.et_auth)
     EditText et_auth;
-
     @Inject
     RegisterPresenter registerPresenter;
 
@@ -62,37 +56,7 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
         String appKey = "19d41ba529a14";
         String appSecret = "985d1b294a6a9d328a5a8f8f20d34cce";
         SMSSDK.initSDK(getContext(), appKey, appSecret);
-        EventHandler eh = new EventHandler() {
-            @Override
-            public void afterEvent(int event, int result, final Object data) {
-                if (result == SMSSDK.RESULT_COMPLETE) {
-                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                        //提交验证码成功
-                        layout_auth.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                layout_auth.setErrorEnabled(false);
-                            }
-                        });
-                        registerPresenter.register();
-                    } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
-                        //获取验证码成功
-                    } else if (event == SMSSDK.EVENT_GET_SUPPORTED_COUNTRIES) {
-                        //返回支持发送验证码的国家列表
-                    }
-                } else {
-                    ((Throwable) data).printStackTrace();
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((LoginActivity) getActivity()).hidePopWindows();
-                            showToast(data.toString());
-                        }
-                    });
-                }
-            }
-        };
-        SMSSDK.registerEventHandler(eh);
+        SMSSDK.registerEventHandler(registerPresenter.getEventHandler());
     }
 
     @OnClick(R.id.register)
@@ -100,7 +64,7 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
         String number = et_name.getText().toString().trim();
         String password = et_password.getText().toString().trim();
         String auth = et_auth.getText().toString().trim();
-        if (number.isEmpty() || !isChinaPhoneLegal(number)) {
+        if (number.isEmpty() || !((LoginActivity) getActivity()).isChinaPhoneLegal(number)) {
             layout_number.setError("手机号码不正确");
             return;
         }
@@ -114,8 +78,9 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
             layout_auth.setError("验证码错误");
             return;
         }
+        registerPresenter.setInfo(number, password);
         SMSSDK.submitVerificationCode("86", number, auth);
-        ((LoginActivity) getActivity()).showPopWindows();
+        showProgress();
     }
 
     @OnClick(R.id.bt_send)
@@ -145,48 +110,40 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
 
     @Override
     public void showProgress() {
+        ((LoginActivity) getActivity()).showProgressDialog();
     }
 
     @Override
     public void hideProgress() {
+        ((LoginActivity) getActivity()).hideProgressDialog();
     }
 
     @Override
-    public void showMessage(String message) {
-        Log.e("RegisterFragment", message);
+    public void showMessage(final String message) {
         layout_auth.post(new Runnable() {
             @Override
             public void run() {
-                ((LoginActivity) getActivity()).hidePopWindows();
-                showToast(getString(R.string.load_failed));
+                hideProgress();
+                showToast("注册失败：" + message);
             }
         });
+        Log.e("RegisterFragment", message);
     }
 
     @Override
     public void succeed() {
-        getActivity().startActivity(new Intent(getContext(), MemberActivity.class));
-        layout_auth.post(new Runnable() {
-            @Override
-            public void run() {
-                showToast("注册成功");
-            }
-        });
+        hideProgress();
+        Intent intent = new Intent(getContext(), EditProfileActivity.class);
+        getActivity().startActivity(intent);
         getActivity().finish();
-    }
-
-    public boolean isChinaPhoneLegal(String str) throws PatternSyntaxException {
-        String regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$";
-        Pattern p = Pattern.compile(regExp);
-        Matcher m = p.matcher(str);
-        return m.matches();
+        showToast("注册成功");
     }
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         registerPresenter.detachView();
         SMSSDK.unregisterAllEventHandler();
+        super.onDestroyView();
     }
 
     @Override

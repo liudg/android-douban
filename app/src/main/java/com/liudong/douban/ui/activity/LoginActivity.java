@@ -1,22 +1,21 @@
 package com.liudong.douban.ui.activity;
 
-import android.graphics.drawable.ColorDrawable;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.PopupWindow;
 
 import com.liudong.douban.R;
 import com.liudong.douban.ui.adapter.ViewPagerAdapter;
 import com.liudong.douban.ui.fragment.login.LoginFragment;
 import com.liudong.douban.ui.fragment.login.RegisterFragment;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import butterknife.BindView;
 
@@ -27,7 +26,7 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.vp_content)
     ViewPager vpContent;
 
-    private PopupWindow popupWindow;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,19 +48,30 @@ public class LoginActivity extends BaseActivity {
         tabContent.setupWithViewPager(vpContent);
     }
 
-    public void showPopWindows() {
-        View view = LayoutInflater.from(this).inflate(R.layout.loading, null, false);
-        popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-        popupWindow.setFocusable(true);
-        popupWindow.showAtLocation(vpContent, Gravity.CENTER, 0, 0);
+    public void showProgressDialog() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("正在执行...");
+        progressDialog.show();
     }
 
-    public void hidePopWindows() {
-        if (popupWindow != null) {
-            popupWindow.dismiss();
+    public void hideProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
         }
+    }
+
+    public boolean isChinaPhoneLegal(String str) throws PatternSyntaxException {
+        String regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$";
+        Pattern p = Pattern.compile(regExp);
+        Matcher m = p.matcher(str);
+        return m.matches();
+    }
+
+    @Override
+    protected void onDestroy() {
+        hideProgressDialog();
+        super.onDestroy();
     }
 
     @Override

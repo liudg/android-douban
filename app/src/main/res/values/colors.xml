@@ -17,8 +17,7 @@
     <color name="colorBlack">#333333</color>
     <color name="colorYellow">#FFB712</color>
 
-    <color name="btnBg">#0D47A1</color>
-    <color name="btnPressBg">#900D47A1</color>
+    <color name="btnPressBg">#1565C0</color>
     <color name="tabSelect">#FFFF8D</color>
 
     <!--夜间主题-->

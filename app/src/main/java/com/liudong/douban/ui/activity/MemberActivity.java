@@ -11,10 +11,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.user.Person;
+import com.liudong.douban.event.RxBus;
 
 import butterknife.BindView;
 import cn.bmob.v3.BmobUser;
 import de.hdodenhof.circleimageview.CircleImageView;
+import rx.Subscription;
+import rx.functions.Action1;
 
 public class MemberActivity extends BaseActivity {
 
@@ -33,11 +36,14 @@ public class MemberActivity extends BaseActivity {
     @BindView(R.id.btn_logout)
     Button btnLogout;
 
+    private Subscription rxSubscription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         initData();
+        eventBus();
     }
 
     private void initData() {
@@ -66,6 +72,40 @@ public class MemberActivity extends BaseActivity {
         }
     }
 
+    private void eventBus() {
+        rxSubscription = RxBus.getInstance().tObservable(Person.class)
+                .subscribe(new Action1<Person>() {
+                    @Override
+                    public void call(Person person) {
+                        //捕捉异常，防止发生错误时调用error方法导致订阅取消，后面事务无法接收
+                        try {
+                            String username = person.getUsername();
+                            String imgUrl = person.getPicture();
+                            String sex = person.getSex();
+                            String dec = person.getDescription();
+                            getSupportActionBar().setTitle(username);
+                            if (imgUrl != null) {
+                                Glide.with(MemberActivity.this)
+                                        .load(imgUrl)
+                                        .into(ivAvatar);
+                            }
+                            if (sex != null && sex.equals("女")) {
+                                ivSex.setImageResource(R.mipmap.ic_profile_female);
+                            } else {
+                                ivSex.setImageResource(R.mipmap.ic_profile_male);
+                            }
+                            if (dec != null) {
+                                tvDec.setText(dec);
+                            } else {
+                                tvDec.setText("这个人很懒，什么都没有留下");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_member, menu);
@@ -85,6 +125,14 @@ public class MemberActivity extends BaseActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!rxSubscription.isUnsubscribed()) {
+            rxSubscription.unsubscribe();
         }
     }
 

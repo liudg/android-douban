@@ -16,9 +16,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
+import com.bumptech.glide.Glide;
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.presenter.EditProfilePresenter;
 import com.liudong.douban.utils.FileUtil;
 import com.yalantis.ucrop.UCrop;
@@ -50,10 +52,12 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
     @Inject
     EditProfilePresenter editProfilePresenter;
     private String imgUrl;
+    private Uri cameraUri;
     private ProgressDialog progressDialog;
     private final String items[] = {"拍照", "相册"};
     private static final int REQUEST_CODE_FROM_CAMERA = 0;
     private static final int REQUEST_CODE_FROM_ALBUM = 1;
+    private String data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +65,19 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
         getSupportActionBar().setTitle("编辑个人信息");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         editProfilePresenter.attachView(this);
-        String data = getIntent().getStringExtra("data");
-        if (data != null && data.equals("memberActivity")) {
+        data = getIntent().getStringExtra("data");
+        if (data != null) {
             fillInProfile();
         }
     }
 
     private void fillInProfile() {
         Person person = BmobUser.getCurrentUser(Person.class);
+        if (person.getPicture() != null) {
+            Glide.with(this)
+                    .load(person.getPicture())
+                    .into(ivAvatar);
+        }
         etName.setText(person.getUsername());
         etDec.setText(person.getDescription());
         if (person.getSex() != null && person.getSex().equals("女")) {
@@ -111,6 +120,10 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
                 dialog.dismiss();
                 switch (which) {
                     case 0:
+                        cameraUri = FileUtil.getCameraPictureUri(getApplicationContext());
+                        Intent intentCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intentCapture.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
+                        startActivityForResult(intentCapture, REQUEST_CODE_FROM_CAMERA);
                         break;
                     case 1:
                         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -147,9 +160,14 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
     @Override
     public void succeed() {
         hideProgress();
-        startActivity(new Intent(this, MemberActivity.class));
-        showToast("修改信息成功");
-        this.finish();
+        RxBus.getInstance().post(BmobUser.getCurrentUser(Person.class));
+        if (data != null) {
+            showToast("修改信息成功");
+            this.finish();
+        } else {
+            startActivity(new Intent(this, MemberActivity.class));
+            this.finish();
+        }
     }
 
     @Override
@@ -167,20 +185,10 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_CODE_FROM_CAMERA:
+                    initUCrop(cameraUri, FileUtil.getSavePictureUri(this));
                     break;
                 case REQUEST_CODE_FROM_ALBUM:
-                    Uri sourceUri = data.getData();
-                    Uri destinationUri = FileUtil.getSavePictureUri(this);
-                    if (destinationUri != null) {
-                        UCrop uCrop = UCrop.of(sourceUri, destinationUri);
-                        //初始化UCrop配置
-                        UCrop.Options options = new UCrop.Options();
-                        options.setToolbarColor(ActivityCompat.getColor(this, R.color.colorPrimary));
-                        options.setFreeStyleCropEnabled(true);
-                        uCrop.withOptions(options);
-                        uCrop.withAspectRatio(1, 1);
-                        uCrop.start(this);
-                    }
+                    initUCrop(data.getData(), FileUtil.getSavePictureUri(this));
                     break;
                 case UCrop.REQUEST_CROP:
                     Uri resultUri = UCrop.getOutput(data);
@@ -192,6 +200,18 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
                     showToast("头像裁剪出错：" + error.getMessage());
                     break;
             }
+        }
+    }
+
+    private void initUCrop(Uri sourceUri, Uri destinationUri) {
+        if (destinationUri != null) {
+            UCrop uCrop = UCrop.of(sourceUri, destinationUri);
+            //初始化UCrop配置
+            UCrop.Options options = new UCrop.Options();
+            options.setToolbarColor(ActivityCompat.getColor(this, R.color.colorPrimary));
+            uCrop.withOptions(options);
+            uCrop.withAspectRatio(1, 1);
+            uCrop.start(this);
         }
     }
 

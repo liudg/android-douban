@@ -51,17 +51,21 @@ public class EditProfilePresenter extends Presenter<EditProfilePresenter.View> {
     public void updateUser(String imgUrl, final String name, final String sex, final String dec) {
         final Person person = BmobUser.getCurrentUser(Person.class);
         if (person != null) {
-            final BmobFile bmobFile = new BmobFile(new File(imgUrl));
-            addSubscription(bmobFile.uploadblock(new UploadFileListener() {
-                @Override
-                public void done(BmobException e) {
-                    if (e == null) {
-                        startUpdate(person, bmobFile.getFileUrl(), name, sex, dec);
-                    } else {
-                        view.showMessage("头像上传失败");
+            if (imgUrl != null) {
+                final BmobFile bmobFile = new BmobFile(new File(imgUrl));
+                addSubscription(bmobFile.uploadblock(new UploadFileListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            startUpdate(person, bmobFile.getFileUrl(), name, sex, dec);
+                        } else {
+                            view.showMessage("头像上传失败");
+                        }
                     }
-                }
-            }));
+                }));
+            } else {
+                startUpdate(person, imgUrl, name, sex, dec);
+            }
         } else {
             view.showMessage("本地用户为空，请登录。");
         }
@@ -69,11 +73,13 @@ public class EditProfilePresenter extends Presenter<EditProfilePresenter.View> {
 
     private void startUpdate(Person person, String imgUrl, String name, String sex, String dec) {
         final Person newPerson = new Person();
-        newPerson.setPicture(imgUrl);
         newPerson.setSex(sex);
         newPerson.setDescription(dec);
         if (!name.equals(person.getUsername())) {
             newPerson.setUsername(name);
+        }
+        if (imgUrl != null) {
+            newPerson.setPicture(imgUrl);
         }
         addSubscription(newPerson.update(person.getObjectId(), new UpdateListener() {
             @Override

@@ -29,6 +29,7 @@ import com.liudong.douban.MyApplication;
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.fragment.book.BookFragment;
 import com.liudong.douban.ui.fragment.movie.MovieFragment;
 
@@ -43,6 +44,8 @@ import butterknife.BindView;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobUser;
 import de.hdodenhof.circleimageview.CircleImageView;
+import rx.Subscription;
+import rx.functions.Action1;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -56,6 +59,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     MainDisplay mainDisplay;
 
     private long mBackPressedTime;
+    private Subscription rxSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             drawer.setClipToPadding(false);
         }
         initLoginState();
+        eventBus();
     }
 
     private void initLoginState() {
@@ -97,9 +102,36 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             } else {
                 tv_dec.setText("这个人很懒，什么都没有留下");
             }
-        } else {
-            MyApplication.getInstance().setLogin(false);
         }
+    }
+
+    private void eventBus() {
+        rxSubscription = RxBus.getInstance().tObservable(Person.class)
+                .subscribe(new Action1<Person>() {
+                    @Override
+                    public void call(Person person) {
+                        //捕捉异常，防止发生错误时调用error方法导致订阅取消，后面事务无法接收
+                        try {
+                            MyApplication.getInstance().setLogin(true);
+                            CircleImageView iv_avatar = (CircleImageView) headerView.findViewById(R.id.iv_avatar);
+                            TextView tv_name = (TextView) headerView.findViewById(R.id.tv_name);
+                            TextView tv_dec = (TextView) headerView.findViewById(R.id.tv_dec);
+                            tv_name.setText(person.getUsername());
+                            if (person.getPicture() != null) {
+                                Glide.with(MainActivity.this)
+                                        .load(person.getPicture())
+                                        .into(iv_avatar);
+                            }
+                            if (person.getDescription() != null) {
+                                tv_dec.setText(person.getDescription());
+                            } else {
+                                tv_dec.setText("这个人很懒，什么都没有留下");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     /**
@@ -230,6 +262,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected int getContentViewID() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!rxSubscription.isUnsubscribed()) {
+            rxSubscription.unsubscribe();
+        }
     }
 
     @Override

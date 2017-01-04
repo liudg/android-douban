@@ -17,7 +17,7 @@ public class FileUtil {
     /**
      * 判断SD卡可用
      */
-    public static boolean hasSDCardMounted() {
+    private static boolean hasSDCardMounted() {
         String state = Environment.getExternalStorageState();
         return state != null && state.equals(Environment.MEDIA_MOUNTED);
     }
@@ -33,6 +33,23 @@ public class FileUtil {
             }
             File outFile = new File(outDir, System.currentTimeMillis() + ".jpg");
             return Uri.fromFile(outFile);
+        } else {
+            Toast.makeText(context, "未检测到SD卡", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    /**
+     * 拍照取头像，文件存放路径
+     */
+    public static Uri getCameraPictureUri(Context context) {
+        if (hasSDCardMounted()) {
+            File cacheDir = context.getExternalCacheDir();
+            if (!cacheDir.exists()) {
+                cacheDir.mkdir();
+            }
+            File file = new File(cacheDir, "temp.jpg");
+            return Uri.fromFile(file);
         } else {
             Toast.makeText(context, "未检测到SD卡", Toast.LENGTH_SHORT).show();
             return null;

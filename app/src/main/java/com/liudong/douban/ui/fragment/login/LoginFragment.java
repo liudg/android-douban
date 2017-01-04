@@ -9,7 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.liudong.douban.R;
+import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.activity.LoginActivity;
 import com.liudong.douban.ui.fragment.BaseFragment;
 import com.liudong.douban.ui.presenter.LoginPresenter;
@@ -18,6 +20,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.bmob.v3.BmobUser;
 
 public class LoginFragment extends BaseFragment implements LoginPresenter.View {
 
@@ -82,6 +85,7 @@ public class LoginFragment extends BaseFragment implements LoginPresenter.View {
     @Override
     public void succeed() {
         hideProgress();
+        RxBus.getInstance().post(BmobUser.getCurrentUser(Person.class));
         getActivity().finish();
         showToast("登录成功");
     }

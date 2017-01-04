@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.liudong.douban.R;
+import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.activity.EditProfileActivity;
 import com.liudong.douban.ui.activity.LoginActivity;
 import com.liudong.douban.ui.fragment.BaseFragment;
@@ -22,6 +24,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.bmob.v3.BmobUser;
 import cn.smssdk.SMSSDK;
 
 public class RegisterFragment extends BaseFragment implements RegisterPresenter.View {
@@ -133,6 +136,7 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     @Override
     public void succeed() {
         hideProgress();
+        RxBus.getInstance().post(BmobUser.getCurrentUser(Person.class));
         Intent intent = new Intent(getContext(), EditProfileActivity.class);
         getActivity().startActivity(intent);
         getActivity().finish();

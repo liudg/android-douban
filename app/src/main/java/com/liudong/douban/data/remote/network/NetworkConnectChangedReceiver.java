@@ -16,6 +16,11 @@ import com.liudong.douban.MyApplication;
 
 public class NetworkConnectChangedReceiver extends BroadcastReceiver {
     private static final String TAG = "NetworkReceiver";
+    private MyApplication mApplication;
+
+    public NetworkConnectChangedReceiver(MyApplication application) {
+        mApplication = application;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -24,10 +29,10 @@ public class NetworkConnectChangedReceiver extends BroadcastReceiver {
             ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
             if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
-                MyApplication.getInstance().setConnected(true);
+                mApplication.setConnected(true);
                 Log.i(TAG, "当前网络连接可用");
             } else {
-                MyApplication.getInstance().setConnected(false);
+                mApplication.setConnected(false);
                 Log.e(TAG, "当前没有网络连接，请确保你已经打开网络");
             }
         }

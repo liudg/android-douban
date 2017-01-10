@@ -18,14 +18,14 @@ import static android.widget.ListPopupWindow.WRAP_CONTENT;
 /**
  * 为RecyclerView添加加载更多（装饰者模式）
  */
-public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class LoadMoreWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int ITEM_TYPE_LOAD_FAILED_VIEW = Integer.MAX_VALUE - 1;
     private static final int ITEM_TYPE_NO_MORE_VIEW = Integer.MAX_VALUE - 2;
     private static final int ITEM_TYPE_LOAD_MORE_VIEW = Integer.MAX_VALUE - 3;
 
     private Context mContext;
-    private RecyclerView.Adapter mInnerAdapter;
+    private RecyclerView.Adapter<RecyclerView.ViewHolder> mInnerAdapter;
 
     private View mLoadMoreView;
     private View mLoadMoreFailedView;
@@ -34,7 +34,7 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private int mCurrentItemType = ITEM_TYPE_LOAD_MORE_VIEW;
     private EndLessOnScrollListener loadMoreScrollListener;
 
-    public LoadMoreWrapper(RecyclerView.Adapter adapter) {
+    public LoadMoreWrapper(RecyclerView.Adapter<RecyclerView.ViewHolder> adapter) {
         mInnerAdapter = adapter;
         loadMoreScrollListener = new EndLessOnScrollListener() {
             @Override
@@ -100,39 +100,43 @@ public class LoadMoreWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ITEM_TYPE_NO_MORE_VIEW) {
-            return getNoMoreViewHolder();
-        } else if (viewType == ITEM_TYPE_LOAD_MORE_VIEW) {
-            return getLoadMoreViewHolder(parent);
-        } else if (viewType == ITEM_TYPE_LOAD_FAILED_VIEW) {
-            return getLoadFailedViewHolder();
+        switch (viewType) {
+            case ITEM_TYPE_NO_MORE_VIEW:
+                return getNoMoreViewHolder();
+            case ITEM_TYPE_LOAD_MORE_VIEW:
+                return getLoadMoreViewHolder(parent);
+            case ITEM_TYPE_LOAD_FAILED_VIEW:
+                return getLoadFailedViewHolder();
+            default:
+                return mInnerAdapter.onCreateViewHolder(parent, viewType);
         }
-        return mInnerAdapter.onCreateViewHolder(parent, viewType);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder.getItemViewType() == ITEM_TYPE_LOAD_FAILED_VIEW) {
-            mLoadMoreFailedView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!MyApplication.getInstance().isConnected()) {
-                        Toast.makeText(mContext, R.string.load_failed, Toast.LENGTH_SHORT).show();
-                        return;
+        switch (holder.getItemViewType()) {
+            case ITEM_TYPE_LOAD_FAILED_VIEW:
+                mLoadMoreFailedView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!MyApplication.getInstance().isConnected()) {
+                            Toast.makeText(mContext, R.string.load_failed, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if (mOnLoadListener != null) {
+                            showLoadMore();
+                            mOnLoadListener.onRetry();
+                        }
                     }
-                    if (mOnLoadListener != null) {
-                        showLoadMore();
-                        mOnLoadListener.onRetry();
-                    }
-                }
-            });
-            return;
-        } else if (holder.getItemViewType() == ITEM_TYPE_LOAD_MORE_VIEW) {
-            return;
-        } else if (holder.getItemViewType() == ITEM_TYPE_NO_MORE_VIEW) {
-            return;
+                });
+                return;
+            case ITEM_TYPE_LOAD_MORE_VIEW:
+                return;
+            case ITEM_TYPE_NO_MORE_VIEW:
+                return;
+            default:
+                mInnerAdapter.onBindViewHolder(holder, position);
         }
-        mInnerAdapter.onBindViewHolder(holder, position);
     }
 
     @Override

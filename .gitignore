@@ -50,3 +50,7 @@ freeline.py
 freeline/
 freeline_core/
 freeline_project_description.json
+将删除 src/main/java/com/liudong/douban/data/model/book/
+将删除 src/main/res/drawable-v21/
+将删除 src/main/res/shape/
+将删除 src/main/sqldelight/com/liudong/douban/data/model/book/

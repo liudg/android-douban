@@ -16,9 +16,12 @@ import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
 import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.activity.EditProfileActivity;
-import com.liudong.douban.ui.activity.LoginActivity;
 import com.liudong.douban.ui.fragment.BaseFragment;
 import com.liudong.douban.ui.presenter.RegisterPresenter;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.inject.Inject;
 
@@ -43,6 +46,8 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     EditText et_auth;
     @Inject
     RegisterPresenter registerPresenter;
+    @Inject
+    RxBus rxBus;
 
     public static RegisterFragment newInstance() {
         return new RegisterFragment();
@@ -52,7 +57,6 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         registerPresenter.attachView(this);
-        initSms();
     }
 
     private void initSms() {
@@ -67,7 +71,7 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
         String number = et_name.getText().toString().trim();
         String password = et_password.getText().toString().trim();
         String auth = et_auth.getText().toString().trim();
-        if (number.isEmpty() || !((LoginActivity) getActivity()).isChinaPhoneLegal(number)) {
+        if (number.isEmpty() || !isChinaPhoneLegal(number)) {
             layout_number.setError("手机号码不正确");
             return;
         }
@@ -88,6 +92,7 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
 
     @OnClick(R.id.bt_send)
     public void sendVCode(final Button button) {
+        initSms();
         final String number = et_name.getText().toString().trim();
         if (number.isEmpty()) {
             showToast("手机号码不能为空");
@@ -108,17 +113,22 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
                 button.setText("发送验证码");
             }
         }.start();
-        SMSSDK.getVerificationCode("86", number);
+        et_name.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SMSSDK.getVerificationCode("86", number);
+            }
+        }, 1000);
     }
 
     @Override
     public void showProgress() {
-        ((LoginActivity) getActivity()).showProgressDialog();
+        listener.showProgressDialog();
     }
 
     @Override
     public void hideProgress() {
-        ((LoginActivity) getActivity()).hideProgressDialog();
+        listener.hideProgressDialog();
     }
 
     @Override
@@ -136,9 +146,9 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     @Override
     public void succeed() {
         hideProgress();
-        RxBus.getInstance().post(BmobUser.getCurrentUser(Person.class));
+        rxBus.post(BmobUser.getCurrentUser(Person.class));
         Intent intent = new Intent(getContext(), EditProfileActivity.class);
-        getActivity().startActivity(intent);
+        getContext().startActivity(intent);
         getActivity().finish();
         showToast("注册成功");
     }
@@ -146,7 +156,6 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     @Override
     public void onDestroyView() {
         registerPresenter.detachView();
-        SMSSDK.unregisterAllEventHandler();
         super.onDestroyView();
     }
 
@@ -158,5 +167,18 @@ public class RegisterFragment extends BaseFragment implements RegisterPresenter.
     @Override
     protected void injectDagger(ActivityComponent activityComponent) {
         activityComponent.inject(this);
+    }
+
+    private boolean isChinaPhoneLegal(String str) throws PatternSyntaxException {
+        String regExp = "^((13[0-9])|(15[^4])|(18[0,2,3,5-9])|(17[0-8])|(147))\\d{8}$";
+        Pattern p = Pattern.compile(regExp);
+        Matcher m = p.matcher(str);
+        return m.matches();
+    }
+
+    private ProgressListener listener;
+
+    public void setListener(ProgressListener listener) {
+        this.listener = listener;
     }
 }

@@ -48,9 +48,11 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
     TextInputLayout layoutName;
     @BindView(R.id.layout_dec)
     TextInputLayout layoutDec;
-
     @Inject
     EditProfilePresenter editProfilePresenter;
+    @Inject
+    RxBus rxBus;
+
     private String imgUrl;
     private Uri cameraUri;
     private ProgressDialog progressDialog;
@@ -160,7 +162,7 @@ public class EditProfileActivity extends BaseActivity implements EditProfilePres
     @Override
     public void succeed() {
         hideProgress();
-        RxBus.getInstance().post(BmobUser.getCurrentUser(Person.class));
+        rxBus.post(BmobUser.getCurrentUser(Person.class));
         if (data != null) {
             showToast("修改信息成功");
             this.finish();

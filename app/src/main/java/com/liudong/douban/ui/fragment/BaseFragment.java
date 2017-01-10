@@ -65,4 +65,13 @@ public abstract class BaseFragment extends Fragment {
     //加载布局
     protected abstract int getFragmentLayout();
 
+    /**
+     * ProgressBar监听
+     */
+    public interface ProgressListener {
+        void showProgressDialog();
+
+        void hideProgressDialog();
+    }
+
 }

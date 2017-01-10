@@ -33,6 +33,10 @@ public class DataManager {
         return mPreferencesHelper;
     }
 
+    public DataBaseHelper getDataBaseHelper() {
+        return mDataBaseHelper;
+    }
+
     public Observable<MovieList> loadHotMovies(int start, int count) {
         return mDouBanService.getHotMovie(start, count);
     }
@@ -47,8 +51,5 @@ public class DataManager {
 
     public Observable<MovieDetail> loadMovieDetail(int id) {
         return mDouBanService.getMovieDetail(id);
-    }
-
-    public void cacheMovieList(String cate, MovieList movieList) {
     }
 }

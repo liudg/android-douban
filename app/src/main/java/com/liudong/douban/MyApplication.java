@@ -10,7 +10,6 @@ import com.liudong.douban.di.modules.ApplicationModule;
 
 /**
  * Created by liudong on 2016/11/22.
- * class note:
  * Base Application for Application
  */
 
@@ -32,7 +31,7 @@ public class MyApplication extends Application {
     private void initReceiver() {
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        NetworkConnectChangedReceiver changedReceiver = new NetworkConnectChangedReceiver();
+        NetworkConnectChangedReceiver changedReceiver = new NetworkConnectChangedReceiver(this);
         registerReceiver(changedReceiver, filter);
     }
 
@@ -42,6 +41,10 @@ public class MyApplication extends Application {
                     applicationModule(new ApplicationModule(this)).build();
         }
         return mAppComponent;
+    }
+
+    public static MyApplication getInstance() {
+        return application;
     }
 
     public boolean isConnected() {
@@ -58,9 +61,5 @@ public class MyApplication extends Application {
 
     public void setLogin(boolean login) {
         isLogin = login;
-    }
-
-    public static MyApplication getInstance() {
-        return application;
     }
 }

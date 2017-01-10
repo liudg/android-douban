@@ -49,6 +49,7 @@ public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
                     if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                         //提交验证码成功
                         register();
+                        SMSSDK.unregisterAllEventHandler();
                     } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                         //获取验证码成功
                     } else if (event == SMSSDK.EVENT_GET_SUPPORTED_COUNTRIES) {

@@ -1,6 +1,8 @@
 package com.liudong.douban.ui.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -49,11 +51,8 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
     ExpandableTextView etv_intro;
     @BindView(R.id.rv_actors)
     RecyclerView rv_actors;
-
-    @OnClick(R.id.fab)
-    void collect() {
-        showToast("点击收藏");
-    }
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
 
     private MovieDetail movieData;
     private int isLoad = 1;
@@ -61,6 +60,7 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     private String id;
     private StaggeredGridAdapter mAdapter;
+    private boolean isCollect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +81,7 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
         id = data.getString("id");
         getSupportActionBar().setTitle(data.getString("title"));
         detailMPresenter.loadData(Integer.parseInt(id));
+        detailMPresenter.isCollect(id);
     }
 
     private void refreshData() {
@@ -105,6 +106,21 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
         mAdapter.setData(actor);
     }
 
+    @OnClick(R.id.fab)
+    void collect() {
+        if (movieData != null) {
+            if (isCollect) {
+                fab.setImageResource(R.mipmap.ic_star);
+                detailMPresenter.cancelCollect(movieData.id());
+            } else {
+                fab.setImageResource(R.mipmap.ic_star_select);
+                detailMPresenter.collect(movieData);
+            }
+        } else {
+            showToast("加载失败");
+        }
+    }
+
     @Override
     protected void onDestroy() {
         detailMPresenter.detachView();
@@ -119,13 +135,14 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
     @Override
     public void showProgress() {
         isLoad = 1;
-        invalidateOptionsMenu();
+        //invalidateOptionsMenu();
+        ActivityCompat.invalidateOptionsMenu(this);
     }
 
     @Override
     public void hideProgress() {
         isLoad = 0;
-        invalidateOptionsMenu();
+        ActivityCompat.invalidateOptionsMenu(this);
     }
 
     @Override
@@ -143,16 +160,33 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
     }
 
     @Override
+    public void collectMessage(String message) {
+        showToast(message);
+    }
+
+    @Override
+    public void collectState(Boolean state) {
+        if (state) {
+            fab.setImageResource(R.mipmap.ic_star_select);
+            isCollect = true;
+        } else {
+            fab.setImageResource(R.mipmap.ic_star);
+            isCollect = false;
+        }
+    }
+
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         switch (isLoad) {
             case 0:
                 hideRefreshAnimation();
-                break;
+                return true;
             case 1:
                 refreshMenuItemView(menu.findItem(R.id.action_refresh));
-                break;
+                return true;
+            default:
+                return super.onPrepareOptionsMenu(menu);
         }
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -175,7 +209,8 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
                 }
                 detailMPresenter.loadData(Integer.parseInt(id));
                 isLoad = 1;
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
+                ActivityCompat.invalidateOptionsMenu(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

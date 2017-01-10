@@ -60,6 +60,7 @@
                 android:background="@color/transparent" />
 
             <RelativeLayout
+                android:id="@+id/rl_collect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/cardViewBackground">
@@ -96,6 +97,7 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/rl_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/cardViewBackground">

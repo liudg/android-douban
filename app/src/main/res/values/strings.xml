@@ -18,6 +18,9 @@
     <string name="book_tit">逗瓣图书</string>
     <string name="Unrealized">功能未实现</string>
 
+    <string name="movie">电影</string>
+    <string name="book">图书</string>
+
     <string name="hot_movie">正在热映</string>
     <string name="upcoming_movie">即将上映</string>
     <string name="top_movie">Top250</string>
@@ -34,9 +37,13 @@
     <string name="register">注册</string>
     <string name="collect">我的收藏</string>
     <string name="history">浏览记录</string>
+    <string name="binding">绑定手机</string>
 
     <string name="browser">用浏览器打开</string>
 
     <string name="photo">拍照</string>
     <string name="gallery">图库</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

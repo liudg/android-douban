@@ -11,12 +11,16 @@ import javax.inject.Singleton;
 @Singleton
 public class PreferencesHelper {
 
-    public static final String PREF_FILE_NAME = "db_pref_file";
+    private static final String PREF_FILE_NAME = "db_pref_file";
     private final SharedPreferences mPref;
 
     @Inject
-    public PreferencesHelper(@ApplicationContext Context context) {
+    PreferencesHelper(@ApplicationContext Context context) {
         mPref = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+    }
+
+    public SharedPreferences getPref() {
+        return mPref;
     }
 
     public void clear() {

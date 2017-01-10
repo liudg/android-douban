@@ -46,7 +46,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    DouBanService provideDouBanService(@ApplicationContext Context context) {
-        return new RetrofitConfig().douBanService(context);
+    DouBanService provideDouBanService(MyApplication application) {
+        return new RetrofitConfig().douBanService(application);
     }
 }

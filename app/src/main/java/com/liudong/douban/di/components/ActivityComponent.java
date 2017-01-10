@@ -3,6 +3,7 @@ package com.liudong.douban.di.components;
 import com.liudong.douban.di.modules.ActivityModule;
 import com.liudong.douban.di.scopes.PerActivity;
 import com.liudong.douban.ui.activity.BaseActivity;
+import com.liudong.douban.ui.activity.CollectActivity;
 import com.liudong.douban.ui.activity.EditProfileActivity;
 import com.liudong.douban.ui.activity.MainActivity;
 import com.liudong.douban.ui.activity.MemberActivity;
@@ -44,5 +45,7 @@ public interface ActivityComponent {
     void inject(EditProfileActivity editProfileActivity);
 
     void inject(MemberActivity memberActivity);
+
+    void inject(CollectActivity collectActivity);
 
 }

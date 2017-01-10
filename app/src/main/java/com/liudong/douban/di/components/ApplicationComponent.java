@@ -4,11 +4,9 @@ import android.content.Context;
 
 import com.liudong.douban.MyApplication;
 import com.liudong.douban.data.DataManager;
-import com.liudong.douban.data.local.DataBaseHelper;
-import com.liudong.douban.data.local.PreferencesHelper;
-import com.liudong.douban.data.remote.DouBanService;
 import com.liudong.douban.di.modules.ApplicationModule;
 import com.liudong.douban.di.scopes.ApplicationContext;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.utils.ToastUtil;
 
 import javax.inject.Singleton;
@@ -27,13 +25,11 @@ public interface ApplicationComponent {
     @ApplicationContext
     Context context();
 
+    MyApplication mApplication();
+
     ToastUtil toastUtil();
-
-    PreferencesHelper preferencesHelper();
-
-    DataBaseHelper databaseHelper();
 
     DataManager dataManager();
 
-    DouBanService douBanService();
+    RxBus rxBus();
 }

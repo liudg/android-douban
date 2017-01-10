@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="16dp"
+        android:padding="16dp"
         android:text="忘记密码？"
         android:textColor="?attr/colorAccent" />
 </LinearLayout>

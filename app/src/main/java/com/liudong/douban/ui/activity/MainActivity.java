@@ -3,6 +3,7 @@ package com.liudong.douban.ui.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -27,8 +29,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.liudong.douban.MyApplication;
 import com.liudong.douban.R;
+import com.liudong.douban.data.DataManager;
+import com.liudong.douban.data.model.user.MovieCollect;
 import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.LogoutEvent;
 import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.fragment.book.BookFragment;
 import com.liudong.douban.ui.fragment.movie.MovieFragment;
@@ -42,10 +47,14 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -53,13 +62,22 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     DrawerLayout drawer;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
-    private View headerView;
-
     @Inject
     MainDisplay mainDisplay;
+    @Inject
+    DataManager dataManager;
+    @Inject
+    MyApplication mApplication;
+    @Inject
+    RxBus rxBus;
+
+    private View headerView;
+    private CircleImageView iv_avatar;
+    private TextView tv_name;
+    private TextView tv_dec;
 
     private long mBackPressedTime;
-    private Subscription rxSubscription;
+    private CompositeSubscription mCompositeSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +87,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
         headerView = navigationView.getHeaderView(0);
+        iv_avatar = (CircleImageView) headerView.findViewById(R.id.iv_avatar);
+        tv_name = (TextView) headerView.findViewById(R.id.tv_name);
+        tv_dec = (TextView) headerView.findViewById(R.id.tv_dec);
+
         if (savedInstanceState == null) {
             getSupportActionBar().setTitle(R.string.movie_tit);
             navigationView.setCheckedItem(R.id.nav_movie);
@@ -80,6 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             drawer.setClipToPadding(false);
         }
         initLoginState();
+        pullCollect();
         eventBus();
     }
 
@@ -87,10 +111,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Bmob.initialize(this, "ca3beeb6c325e061d5c2e65324e9be5f");
         Person person = BmobUser.getCurrentUser(Person.class);
         if (person != null) {
-            MyApplication.getInstance().setLogin(true);
-            CircleImageView iv_avatar = (CircleImageView) headerView.findViewById(R.id.iv_avatar);
-            TextView tv_name = (TextView) headerView.findViewById(R.id.tv_name);
-            TextView tv_dec = (TextView) headerView.findViewById(R.id.tv_dec);
+            mApplication.setLogin(true);
             tv_name.setText(person.getUsername());
             if (person.getPicture() != null) {
                 Glide.with(this)
@@ -105,17 +126,35 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
+    /**
+     * 拉取用户收藏信息
+     */
+    private void pullCollect() {
+        if (mApplication.isLogin()) {
+            BmobQuery<MovieCollect> bmobQuery = new BmobQuery<>();
+            bmobQuery.addWhereEqualTo("user", BmobUser.getCurrentUser().getUsername());
+            bmobQuery.addQueryKeys("objectId,id");
+            bmobQuery.findObjects(new FindListener<MovieCollect>() {
+                @Override
+                public void done(List<MovieCollect> list, BmobException e) {
+                    if (e == null) {
+                        dataManager.getDataBaseHelper().insertMovieList(list);
+                    } else {
+                        showToast("用户收藏信息读取失败");
+                    }
+                }
+            });
+        }
+    }
+
     private void eventBus() {
-        rxSubscription = RxBus.getInstance().tObservable(Person.class)
+        addSubscription(rxBus.filteredObservable(Person.class)
                 .subscribe(new Action1<Person>() {
                     @Override
                     public void call(Person person) {
                         //捕捉异常，防止发生错误时调用error方法导致订阅取消，后面事务无法接收
                         try {
-                            MyApplication.getInstance().setLogin(true);
-                            CircleImageView iv_avatar = (CircleImageView) headerView.findViewById(R.id.iv_avatar);
-                            TextView tv_name = (TextView) headerView.findViewById(R.id.tv_name);
-                            TextView tv_dec = (TextView) headerView.findViewById(R.id.tv_dec);
+                            mApplication.setLogin(true);
                             tv_name.setText(person.getUsername());
                             if (person.getPicture() != null) {
                                 Glide.with(MainActivity.this)
@@ -127,11 +166,26 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                             } else {
                                 tv_dec.setText("这个人很懒，什么都没有留下");
                             }
+                            pullCollect();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
-                });
+                }));
+        addSubscription(rxBus.filteredObservable(LogoutEvent.class)
+                .subscribe(new Action1<LogoutEvent>() {
+                    @Override
+                    public void call(LogoutEvent logoutEvent) {
+                        try {
+                            mApplication.setLogin(logoutEvent.isLogin());
+                            iv_avatar.setImageResource(R.mipmap.avatar_anynomous);
+                            tv_name.setText(logoutEvent.getUsername());
+                            tv_dec.setText(logoutEvent.getDec());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }));
     }
 
     /**
@@ -156,6 +210,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         refreshUI();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void refreshUI() {
         TypedValue toolbarBg = new TypedValue();
         TypedValue mainBg = new TypedValue();
@@ -196,19 +251,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         declaredField.setAccessible(true);
                         Method declaredMethod = Class.forName(RecyclerView.Recycler.class.getName()).getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
                         declaredMethod.setAccessible(true);
-                        declaredMethod.invoke(declaredField.get(recyclerView), new Object[0]);
+                        declaredMethod.invoke(declaredField.get(recyclerView));
                         RecyclerView.RecycledViewPool recycledViewPool = recyclerView.getRecycledViewPool();
                         recycledViewPool.clear();
 
-                    } catch (NoSuchFieldException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (NoSuchFieldException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
@@ -259,6 +306,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return bitmap;
     }
 
+    private void addSubscription(Subscription s) {
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
+        }
+        mCompositeSubscription.add(s);
+    }
+
     @Override
     protected int getContentViewID() {
         return R.layout.activity_main;
@@ -267,8 +321,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!rxSubscription.isUnsubscribed()) {
-            rxSubscription.unsubscribe();
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.unsubscribe();
         }
     }
 
@@ -289,7 +343,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_movie:
@@ -311,7 +365,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 getSupportActionBar().setTitle(R.string.book_tit);
                 break;
             case R.id.me:
-                if (MyApplication.getInstance().isLogin()) {
+                if (mApplication.isLogin()) {
                     startActivity(new Intent(this, MemberActivity.class));
                 } else {
                     startActivity(new Intent(this, LoginActivity.class));

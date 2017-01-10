@@ -1,13 +1,11 @@
 package com.liudong.douban.data.remote;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.liudong.douban.MyApplication;
-import com.liudong.douban.di.scopes.ApplicationContext;
 import com.liudong.douban.utils.MyAdapterFactory;
 
 import java.io.File;
@@ -25,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitConfig {
 
-    public DouBanService douBanService(@ApplicationContext final Context context) {
+    public DouBanService douBanService(final MyApplication application) {
 
         Interceptor REWRITE_RESPONSE_INTERCEPTOR = new Interceptor() {
             @Override
@@ -48,7 +46,7 @@ public class RetrofitConfig {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request request = chain.request();
-                if (!MyApplication.getInstance().isConnected()) {
+                if (!application.isConnected()) {
                     Log.i("OFFLINE_INTERCEPTOR", "请求缓存");
                     int maxStale = 60 * 60 * 24 * 14; //设置缓存超时时间为2周
                     request = request.newBuilder()
@@ -61,7 +59,7 @@ public class RetrofitConfig {
         };
 
         //设置缓存路径
-        File httpCacheDirectory = new File(context.getCacheDir(), "responses");
+        File httpCacheDirectory = new File(application.getCacheDir(), "responses");
         //设置缓存 10M
         Cache cache = new Cache(httpCacheDirectory, 10 * 1024 * 1024);
 

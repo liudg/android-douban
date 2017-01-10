@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.liudong.douban.data.model.user.MovieCollectDb;
 import com.liudong.douban.di.scopes.ApplicationContext;
 
 import javax.inject.Inject;
@@ -24,7 +25,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.beginTransaction();
         try {
-            //db.execSQL();
+            db.execSQL(MovieCollectDb.CREATE_TABLE);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

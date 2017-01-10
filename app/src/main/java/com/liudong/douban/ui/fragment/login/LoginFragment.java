@@ -1,18 +1,18 @@
 package com.liudong.douban.ui.fragment.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.user.Person;
 import com.liudong.douban.di.components.ActivityComponent;
 import com.liudong.douban.event.RxBus;
-import com.liudong.douban.ui.activity.LoginActivity;
+import com.liudong.douban.ui.activity.ForgotPwActivity;
 import com.liudong.douban.ui.fragment.BaseFragment;
 import com.liudong.douban.ui.presenter.LoginPresenter;
 
@@ -26,6 +26,8 @@ public class LoginFragment extends BaseFragment implements LoginPresenter.View {
 
     @Inject
     LoginPresenter loginPresenter;
+    @Inject
+    RxBus rxBus;
     @BindView(R.id.et_name)
     EditText etName;
     @BindView(R.id.layout_name)
@@ -34,8 +36,6 @@ public class LoginFragment extends BaseFragment implements LoginPresenter.View {
     EditText etPassword;
     @BindView(R.id.layout_password)
     TextInputLayout layoutPassword;
-    @BindView(R.id.tv_forgot)
-    TextView tvForgot;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
@@ -65,14 +65,20 @@ public class LoginFragment extends BaseFragment implements LoginPresenter.View {
         showProgress();
     }
 
+    @OnClick(R.id.tv_forgot)
+    public void forgot() {
+        Intent intent = new Intent(getContext(), ForgotPwActivity.class);
+        getContext().startActivity(intent);
+    }
+
     @Override
     public void showProgress() {
-        ((LoginActivity) getActivity()).showProgressDialog();
+        listener.showProgressDialog();
     }
 
     @Override
     public void hideProgress() {
-        ((LoginActivity) getActivity()).hideProgressDialog();
+        listener.hideProgressDialog();
     }
 
     @Override
@@ -85,7 +91,7 @@ public class LoginFragment extends BaseFragment implements LoginPresenter.View {
     @Override
     public void succeed() {
         hideProgress();
-        RxBus.getInstance().post(BmobUser.getCurrentUser(Person.class));
+        rxBus.post(BmobUser.getCurrentUser(Person.class));
         getActivity().finish();
         showToast("登录成功");
     }
@@ -104,5 +110,11 @@ public class LoginFragment extends BaseFragment implements LoginPresenter.View {
     @Override
     protected void injectDagger(ActivityComponent activityComponent) {
         activityComponent.inject(this);
+    }
+
+    private ProgressListener listener;
+
+    public void setListener(ProgressListener listener) {
+        this.listener = listener;
     }
 }

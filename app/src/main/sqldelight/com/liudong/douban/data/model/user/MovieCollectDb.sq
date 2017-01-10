@@ -1,0 +1,13 @@
+CREATE TABLE movie_collect (
+    objectId TEXT NOT NULL PRIMARY KEY,
+    mid TEXT NOT NULL
+);
+
+delete_all:
+DELETE FROM movie_collect;
+
+select_row:
+SELECT * FROM movie_collect WHERE mid = ?;
+
+select_count:
+SELECT count(*) FROM movie_collect;

@@ -27,6 +27,7 @@ public class DataManager {
         mDouBanService = douBanService;
         mDataBaseHelper = dataBaseHelper;
         mPreferencesHelper = preferencesHelper;
+        System.out.println("1111");
     }
 
     public PreferencesHelper getPreferencesHelper() {

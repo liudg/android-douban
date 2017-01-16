@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.liudong.douban.MyApplication;
 import com.liudong.douban.R;
+import com.liudong.douban.ui.adapter.listener.EndLessOnScrollListener;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.ListPopupWindow.WRAP_CONTENT;
@@ -20,9 +21,9 @@ import static android.widget.ListPopupWindow.WRAP_CONTENT;
  */
 public class LoadMoreWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int ITEM_TYPE_LOAD_FAILED_VIEW = Integer.MAX_VALUE - 1;
-    private static final int ITEM_TYPE_NO_MORE_VIEW = Integer.MAX_VALUE - 2;
-    private static final int ITEM_TYPE_LOAD_MORE_VIEW = Integer.MAX_VALUE - 3;
+    public static final int ITEM_TYPE_LOAD_FAILED_VIEW = 0x00000111;
+    public static final int ITEM_TYPE_NO_MORE_VIEW = 0x00000222;
+    public static final int ITEM_TYPE_LOAD_MORE_VIEW = 0x00000333;
 
     private Context mContext;
     private RecyclerView.Adapter<RecyclerView.ViewHolder> mInnerAdapter;

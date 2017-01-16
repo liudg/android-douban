@@ -1,4 +1,4 @@
-package com.liudong.douban.ui.adapter;
+package com.liudong.douban.ui.adapter.listener;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
  * Created by liudong on 2016/12/20.
  * Desc:用于RecyclerView加载更多的监听，实现滑动到底部自动加载更多
  */
-abstract class EndLessOnScrollListener extends RecyclerView.OnScrollListener {
+public abstract class EndLessOnScrollListener extends RecyclerView.OnScrollListener {
 
     private int previousTotal;
     private boolean isLoading = true;

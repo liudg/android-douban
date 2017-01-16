@@ -1,7 +1,5 @@
 package com.liudong.douban.ui.adapter;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.movie.Subjects;
-import com.liudong.douban.ui.activity.MovieDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,19 +51,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.rb_start.setRating((float) subjects.rating().average() / 2);
         holder.tv_rating.setText(String.valueOf(subjects.rating().average()));
         holder.tv_cast.setText(intro);
-
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(fragment.getContext(), MovieDetailActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("imgUrl", subjects.images().large());
-                bundle.putString("title", subjects.title());
-                bundle.putString("id", subjects.id());
-                intent.putExtra("data", bundle);
-                fragment.startActivity(intent);
-            }
-        });
     }
 
     @Override

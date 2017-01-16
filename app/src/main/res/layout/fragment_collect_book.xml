@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/mainBackground"
-    tools:context="com.liudong.douban.ui.fragment.member.HistoryFragment">
+    tools:context="com.liudong.douban.ui.fragment.member.BookCollectFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"

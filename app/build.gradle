@@ -40,6 +40,7 @@ dependencies {
     compile rootProject.ext.dependencies["design"]
     compile rootProject.ext.dependencies["support-v4"]
     compile rootProject.ext.dependencies["cardview-v7"]
+    compile rootProject.ext.dependencies["constraint-layout"]
     compile rootProject.ext.dependencies["butterknife"]
     annotationProcessor rootProject.ext.dependencies["butterknife-compiler"]
     compile rootProject.ext.dependencies["dagger"]
@@ -67,6 +68,5 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:support-v4:25.1.0'
     testCompile 'junit:junit:4.12'
 }

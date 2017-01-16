@@ -44,7 +44,7 @@
         <activity android:name=".ui.activity.ChangePwActivity" />
         <activity android:name=".ui.activity.ForgotPwActivity" />
         <activity android:name=".ui.activity.CollectActivity" />
-        <activity android:name=".ui.activity.HistoryActivity"></activity>
+        <activity android:name=".ui.activity.HistoryActivity" />
     </application>
 
 </manifest>

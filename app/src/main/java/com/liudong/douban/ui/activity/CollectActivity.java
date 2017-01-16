@@ -9,8 +9,8 @@ import android.view.MenuItem;
 
 import com.liudong.douban.R;
 import com.liudong.douban.ui.adapter.ViewPagerAdapter;
-import com.liudong.douban.ui.fragment.member.CollectFragment;
-import com.liudong.douban.ui.fragment.member.HistoryFragment;
+import com.liudong.douban.ui.fragment.member.MovieCollectFragment;
+import com.liudong.douban.ui.fragment.member.BookCollectFragment;
 
 import butterknife.BindView;
 
@@ -31,8 +31,8 @@ public class CollectActivity extends BaseActivity {
 
     private void initViewPager() {
         SparseArrayCompat<Fragment> fragments = new SparseArrayCompat<>();
-        fragments.append(0, CollectFragment.newInstance());
-        fragments.append(1, HistoryFragment.newInstance());
+        fragments.append(0, MovieCollectFragment.newInstance());
+        fragments.append(1, BookCollectFragment.newInstance());
         String[] titles = {getString(R.string.movie), getString(R.string.book)};
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), fragments, titles);

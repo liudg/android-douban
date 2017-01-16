@@ -12,6 +12,7 @@ import com.liudong.douban.ui.fragment.BaseFragment;
 import com.liudong.douban.ui.fragment.LazyFragment;
 import com.liudong.douban.ui.fragment.login.LoginFragment;
 import com.liudong.douban.ui.fragment.login.RegisterFragment;
+import com.liudong.douban.ui.fragment.member.MovieCollectFragment;
 import com.liudong.douban.ui.fragment.movie.HotMFragment;
 import com.liudong.douban.ui.fragment.movie.TopMFragment;
 import com.liudong.douban.ui.fragment.movie.UpcomingMFragment;
@@ -47,5 +48,7 @@ public interface ActivityComponent {
     void inject(MemberActivity memberActivity);
 
     void inject(CollectActivity collectActivity);
+
+    void inject(MovieCollectFragment movieCollectFragment);
 
 }

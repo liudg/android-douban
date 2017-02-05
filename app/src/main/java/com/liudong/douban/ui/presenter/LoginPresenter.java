@@ -15,7 +15,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
-    private CompositeSubscription mCompositeSubscription;
 
     @Inject
     LoginPresenter(DataManager mDataManager) {
@@ -29,9 +28,7 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
 
     @Override
     public void detachView() {
-        if (mCompositeSubscription != null) {
-            mCompositeSubscription.unsubscribe();
-        }
+        unSubscribe();
         view = null;
     }
 
@@ -46,18 +43,6 @@ public class LoginPresenter extends Presenter<LoginPresenter.View> {
                 }
             }
         }));
-    }
-
-    /**
-     * 解决Subscription内存泄露问题
-     *
-     * @param s
-     */
-    private void addSubscription(Subscription s) {
-        if (mCompositeSubscription == null) {
-            mCompositeSubscription = new CompositeSubscription();
-        }
-        mCompositeSubscription.add(s);
     }
 
     public interface View {

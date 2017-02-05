@@ -31,7 +31,7 @@ public class RxBus {
     }
 
     /**
-     * 返回事件总线的所有观察者
+     * 返回事件总线的所有被观察者
      */
     public Observable<Object> observable() {
         return bus;

@@ -1,6 +1,5 @@
 package com.liudong.douban.ui.fragment.member;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,6 +12,8 @@ import android.widget.FrameLayout;
 import com.liudong.douban.R;
 import com.liudong.douban.data.model.user.MovieCollect;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.CollectEvent;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.activity.MovieDetailActivity;
 import com.liudong.douban.ui.adapter.CollectAdapter;
 import com.liudong.douban.ui.adapter.LoadMoreWrapper;
@@ -26,6 +27,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class MovieCollectFragment extends LazyFragment implements CollectMPresenter.View,
         SwipeRefreshLayout.OnRefreshListener, LoadMoreWrapper.OnLoadListener {
@@ -38,6 +42,8 @@ public class MovieCollectFragment extends LazyFragment implements CollectMPresen
     FrameLayout flContent;
     @Inject
     CollectMPresenter collectMPresenter;
+    @Inject
+    RxBus rxBus;
 
     CollectAdapter mAdapter;
     LoadMoreWrapper loadMoreWrapper;
@@ -46,6 +52,8 @@ public class MovieCollectFragment extends LazyFragment implements CollectMPresen
     private int start;
     private int count;
     private boolean isLoad;
+    private int mPosition;
+    private CompositeSubscription mCompositeSubscription;
 
     public static MovieCollectFragment newInstance() {
         return new MovieCollectFragment();
@@ -76,8 +84,10 @@ public class MovieCollectFragment extends LazyFragment implements CollectMPresen
                 bundle.putString("id", collect.getId());
                 intent.putExtra("data", bundle);
                 startActivity(intent);
+                mPosition = position;
             }
         });
+        eventBus();
     }
 
     @Override
@@ -154,6 +164,26 @@ public class MovieCollectFragment extends LazyFragment implements CollectMPresen
         hideProgress();
     }
 
+    private void eventBus() {
+        addSubscription(rxBus.filteredObservable(CollectEvent.class)
+                .subscribe(new Action1<CollectEvent>() {
+                    @Override
+                    public void call(CollectEvent collectEvent) {
+                        collects.remove(mPosition);
+                        start--;
+                        mAdapter.setDate(0, collects);
+                        loadMoreWrapper.notifyDataSetChanged();
+                    }
+                }));
+    }
+
+    private void addSubscription(Subscription s) {
+        if (mCompositeSubscription == null) {
+            mCompositeSubscription = new CompositeSubscription();
+        }
+        mCompositeSubscription.add(s);
+    }
+
     @Override
     protected int getFragmentLayout() {
         return R.layout.fragment_collect_movie;
@@ -167,6 +197,9 @@ public class MovieCollectFragment extends LazyFragment implements CollectMPresen
     @Override
     public void onDestroyView() {
         collectMPresenter.detachView();
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.unsubscribe();
+        }
         super.onDestroyView();
     }
 }

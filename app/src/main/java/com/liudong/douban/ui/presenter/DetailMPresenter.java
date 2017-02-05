@@ -40,6 +40,7 @@ public class DetailMPresenter extends Presenter<DetailMPresenter.View> {
     @Override
     public void detachView() {
         activityLifecycle.onNext(ActivityEvent.DESTROY);
+        unSubscribe();
         view = null;
     }
 
@@ -81,7 +82,7 @@ public class DetailMPresenter extends Presenter<DetailMPresenter.View> {
             movieCollect.setTitle(title);
             movieCollect.setYear(year);
             movieCollect.setActor(actor);
-            movieCollect.save(new SaveListener<String>() {
+            addSubscription(movieCollect.save(new SaveListener<String>() {
                 @Override
                 public void done(String s, BmobException e) {
                     if (e == null) {
@@ -92,7 +93,7 @@ public class DetailMPresenter extends Presenter<DetailMPresenter.View> {
                         view.collectMessage("收藏失败");
                     }
                 }
-            });
+            }));
         } else {
             view.collectMessage("用户未登录");
         }
@@ -101,16 +102,17 @@ public class DetailMPresenter extends Presenter<DetailMPresenter.View> {
     public void cancelCollect(String id) {
         MovieCollect movieCollect = new MovieCollect();
         movieCollect.setObjectId(objectId);
-        movieCollect.delete(new UpdateListener() {
+        addSubscription(movieCollect.delete(new UpdateListener() {
             @Override
             public void done(BmobException e) {
                 if (e == null) {
                     mDataManager.getDataBaseHelper().deleteMovie(objectId);
+                    view.collectMessage("成功");
                 } else {
                     view.collectMessage("取消收藏失败");
                 }
             }
-        });
+        }));
     }
 
     public void isCollect(String id) {

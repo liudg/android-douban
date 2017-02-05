@@ -134,7 +134,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             BmobQuery<MovieCollect> bmobQuery = new BmobQuery<>();
             bmobQuery.addWhereEqualTo("user", BmobUser.getCurrentUser().getUsername());
             bmobQuery.addQueryKeys("objectId,id");
-            bmobQuery.findObjects(new FindListener<MovieCollect>() {
+            addSubscription(bmobQuery.findObjects(new FindListener<MovieCollect>() {
                 @Override
                 public void done(List<MovieCollect> list, BmobException e) {
                     if (e == null) {
@@ -143,7 +143,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         showToast("用户收藏信息读取失败");
                     }
                 }
-            });
+            }));
         }
     }
 

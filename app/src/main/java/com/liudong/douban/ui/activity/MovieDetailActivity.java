@@ -19,6 +19,8 @@ import com.liudong.douban.R;
 import com.liudong.douban.data.model.movie.Actors;
 import com.liudong.douban.data.model.movie.MovieDetail;
 import com.liudong.douban.di.components.ActivityComponent;
+import com.liudong.douban.event.CollectEvent;
+import com.liudong.douban.event.RxBus;
 import com.liudong.douban.ui.adapter.StaggeredGridAdapter;
 import com.liudong.douban.ui.presenter.DetailMPresenter;
 import com.liudong.douban.ui.view.ExpandableTextView;
@@ -36,7 +38,8 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     @Inject
     DetailMPresenter detailMPresenter;
-
+    @Inject
+    RxBus rxBus;
     @BindView(R.id.iv_avatar)
     ImageView iv_avatar;
     @BindView(R.id.tv_info)
@@ -161,6 +164,11 @@ public class MovieDetailActivity extends BaseActivity implements DetailMPresente
 
     @Override
     public void collectMessage(String message) {
+        if (message.equals("成功")) {
+            CollectEvent collectEvent = new CollectEvent(true);
+            rxBus.post(collectEvent);
+            return;
+        }
         showToast(message);
     }
 

@@ -12,15 +12,12 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 @PerActivity
 public class CollectMPresenter extends Presenter<CollectMPresenter.View> {
 
     private View view;
     private final DataManager dataManager;
-    private CompositeSubscription compositeSubscription;
 
     @Inject
     CollectMPresenter(DataManager dataManager) {
@@ -34,9 +31,7 @@ public class CollectMPresenter extends Presenter<CollectMPresenter.View> {
 
     @Override
     public void detachView() {
-        if (compositeSubscription != null) {
-            compositeSubscription.unsubscribe();
-        }
+        unSubscribe();
         view = null;
     }
 
@@ -54,13 +49,6 @@ public class CollectMPresenter extends Presenter<CollectMPresenter.View> {
                         }
                     }
                 }));
-    }
-
-    private void addSubscription(Subscription subscription) {
-        if (compositeSubscription == null) {
-            compositeSubscription = new CompositeSubscription();
-        }
-        compositeSubscription.add(subscription);
     }
 
     public interface View {

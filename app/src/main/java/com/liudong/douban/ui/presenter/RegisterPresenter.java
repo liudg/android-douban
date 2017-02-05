@@ -10,15 +10,12 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 @PerActivity
 public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
 
     private View view;
     private final DataManager mDataManager;
-    private CompositeSubscription mCompositeSubscription;
 
     private String number;
     private String password;
@@ -35,9 +32,7 @@ public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
 
     @Override
     public void detachView() {
-        if (mCompositeSubscription != null) {
-            mCompositeSubscription.unsubscribe();
-        }
+        unSubscribe();
         view = null;
     }
 
@@ -78,18 +73,6 @@ public class RegisterPresenter extends Presenter<RegisterPresenter.View> {
                 }
             }
         }));
-    }
-
-    /**
-     * 解决Subscription内存泄露问题
-     *
-     * @param s
-     */
-    private void addSubscription(Subscription s) {
-        if (mCompositeSubscription == null) {
-            mCompositeSubscription = new CompositeSubscription();
-        }
-        mCompositeSubscription.add(s);
     }
 
     public void setInfo(String num, String pw) {

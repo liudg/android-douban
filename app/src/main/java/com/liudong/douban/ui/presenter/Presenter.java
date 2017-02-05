@@ -1,8 +1,10 @@
 package com.liudong.douban.ui.presenter;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by liudong on 2016/11/16.
@@ -74,5 +76,23 @@ abstract class Presenter<T> {
                 }));
             }
         };
+    }
+
+    /**
+     * Bmob服务生命周期
+     */
+    private CompositeSubscription compositeSubscription;
+
+    void addSubscription(Subscription subscription) {
+        if (compositeSubscription == null) {
+            compositeSubscription = new CompositeSubscription();
+        }
+        compositeSubscription.add(subscription);
+    }
+
+    void unSubscribe() {
+        if (compositeSubscription != null) {
+            compositeSubscription.unsubscribe();
+        }
     }
 }

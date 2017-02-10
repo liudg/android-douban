@@ -18,6 +18,8 @@ Material Design + Dagger2 + Rxjava + Retrofit + MVP 电影/图书APP
 
 - Rxjava实现事件总线
 
+- 夜间模式
+
 ### 项目截图
 
 ![](https://github.com/liudg/android-douban/raw/master/screenshots/1.jpg)

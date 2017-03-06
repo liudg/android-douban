@@ -30,7 +30,27 @@ Material Design + Dagger2 + Rxjava + Retrofit + MVP 电影/图书APP
 
 ### 开源项目
 
-- 后续补上
+- [butterknife](https://github.com/JakeWharton/butterknife)
+
+- [dagger2](https://github.com/google/dagger)
+
+- [rxjava](https://github.com/ReactiveX/RxJava)
+
+- [retrofit](https://github.com/square/retrofit)
+
+- [gson](https://github.com/google/gson)
+
+- [glide](https://github.com/bumptech/glide)
+
+- [auto-value](https://github.com/google/auto)
+
+- [sqlbrite](https://github.com/square/sqlbrite)
+
+- [sqldelight](https://github.com/square/sqldelight)
+
+- [ucrop](https://github.com/Yalantis/uCrop)
+
+- [circleimageview](https://github.com/hdodenhof/CircleImageView)
 
 ### 关于我
 
